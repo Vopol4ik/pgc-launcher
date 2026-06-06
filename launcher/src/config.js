@@ -94,6 +94,9 @@ module.exports = {
     releaseTag: contentUrls.releaseTag || github.releaseTag
   },
 
+  /** Пока лаунчер открыт — проверка GitHub каждые 2 минуты. */
+  updatePollIntervalMs: 120000,
+
   /** JVM: меньше вылетов при долгой игре на тяжёлой сборке. */
   jvmArgs: [
     '-XX:+UseG1GC',

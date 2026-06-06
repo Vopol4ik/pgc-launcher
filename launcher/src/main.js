@@ -129,8 +129,13 @@ app.whenReady().then(() => {
   applyLauncherCpuLimit(MAX_CPU_PERCENT, process.pid);
   createWindow();
   mainWindow.webContents.once('did-finish-load', () => {
+    launcher.startBackgroundUpdateLoop();
     launcher.syncModpackOnStartup().catch(() => {});
   });
+});
+
+app.on('before-quit', () => {
+  launcher.stopBackgroundUpdateLoop();
 });
 
 app.on('window-all-closed', () => {

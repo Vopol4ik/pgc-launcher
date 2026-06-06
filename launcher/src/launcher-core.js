@@ -143,14 +143,55 @@ class GameLauncher extends EventEmitter {
     this.gameDir = getGameDir();
     this.client = new Client();
     this.gameRunning = false;
+    this.syncInProgress = false;
+    this.backgroundUpdateTimer = null;
   }
 
   log(msg) {
     this.emit('log', msg);
   }
 
-  status(text, progress) {
-    this.emit('status', { text, progress: typeof progress === 'number' ? progress : null });
+  status(text, progress, extra = {}) {
+    const updating = Boolean(extra.updating);
+    this.emit('status', {
+      text,
+      progress: typeof progress === 'number' ? progress : null,
+      updating
+    });
+  }
+
+  isModpackDownloadPhase(text) {
+    if (!text) return false;
+    const t = String(text).toLowerCase();
+    return t.includes('загрузка:')
+      || t.includes('скачивание')
+      || t.includes('удаление устарев')
+      || t.includes('обновление завершено')
+      || t.includes('сборка обновлена');
+  }
+
+  modpackStatusCallback(text, progress) {
+    const downloading = this.isModpackDownloadPhase(text);
+    if (downloading) {
+      this.status('Скачивание обновления…', progress, { updating: true });
+      return;
+    }
+    this.status(text, progress, { updating: false });
+  }
+
+  startBackgroundUpdateLoop() {
+    this.stopBackgroundUpdateLoop();
+    const ms = Number(config.updatePollIntervalMs) || 120000;
+    this.backgroundUpdateTimer = setInterval(() => {
+      this.syncModpackOnStartup().catch(() => {});
+    }, ms);
+  }
+
+  stopBackgroundUpdateLoop() {
+    if (this.backgroundUpdateTimer) {
+      clearInterval(this.backgroundUpdateTimer);
+      this.backgroundUpdateTimer = null;
+    }
   }
 
   // Где искать сборку модов.
@@ -276,11 +317,15 @@ class GameLauncher extends EventEmitter {
     } else {
       this.log('Проверка обновлений сборки…');
     }
-    this.status('Проверка обновлений…', 0);
+    if (check.ok && check.available) {
+      this.status('Скачивание обновления…', 0, { updating: true });
+    } else {
+      this.status('Проверка обновлений…', 0, { updating: false });
+    }
     const result = await applyUpdates(
       this.gameDir,
       (m) => this.log(m),
-      (t, p) => this.status(t, p)
+      (t, p) => this.modpackStatusCallback(t, p)
     );
     const removed = await applyManifestRemovals(this.gameDir, (m) => this.log(m));
     if (removed > 0) {
@@ -290,24 +335,28 @@ class GameLauncher extends EventEmitter {
       this.log(`Сборка обновлена: ${result.fileCount} файл(ов), рев. ${check.revision ?? '?'}.`);
     }
     await this.stripBlockedMods(path.join(this.gameDir, 'mods'));
-    this.status('Готов к запуску', 0);
+    this.status('Готов к запуску', 0, { updating: false });
     return result;
   }
 
   /** Синхронизация при открытии лаунчера (до нажатия «Играть»). */
   async syncModpackOnStartup() {
-    if (this.gameRunning) return { ok: true, skipped: true };
-    await fsp.mkdir(this.gameDir, { recursive: true });
-    if (await this.modsNeedInstall()) {
-      this.log('Первая установка — полное обновление при запуске игры.');
-      return { ok: true, skipped: true };
-    }
+    if (this.gameRunning || this.syncInProgress) return { ok: true, skipped: true };
+    this.syncInProgress = true;
     try {
+      await fsp.mkdir(this.gameDir, { recursive: true });
+      if (await this.modsNeedInstall()) {
+        this.log('Первая установка — полное обновление при запуске игры.');
+        return { ok: true, skipped: true };
+      }
       await this.autoApplyModpackUpdates();
       return { ok: true };
     } catch (e) {
-      this.log(`Обновление при старте: ${e.message}`);
+      this.log(`Обновление: ${e.message}`);
+      this.status('Готов к запуску', 0, { updating: false });
       return { ok: false, error: e.message };
+    } finally {
+      this.syncInProgress = false;
     }
   }
 
@@ -479,6 +528,7 @@ class GameLauncher extends EventEmitter {
     this.client.on('close', async (code) => {
       this.gameRunning = false;
       this.emit('game-close', code);
+      this.syncModpackOnStartup().catch(() => {});
     });
 
     this.log('Запуск игры…');

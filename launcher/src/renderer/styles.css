@@ -245,7 +245,35 @@ html, body {
   box-shadow: 0 0 12px var(--accent-glow);
   transition: width 0.25s ease;
 }
-.status-text { font-size: 13px; color: var(--muted); margin-top: 8px; }
+.status-text { font-size: 13px; color: var(--muted); margin-top: 8px; transition: color 0.2s ease; }
+
+.status-text.is-updating {
+  font-weight: 600;
+  background: linear-gradient(
+    90deg,
+    #2563eb 0%,
+    #60a5fa 25%,
+    #bfdbfe 50%,
+    #60a5fa 75%,
+    #2563eb 100%
+  );
+  background-size: 220% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: status-shimmer 2.2s linear infinite;
+}
+
+.progress-fill.is-updating {
+  background: linear-gradient(90deg, #2563eb, #60a5fa, #93c5fd, #60a5fa, #2563eb);
+  background-size: 220% auto;
+  animation: status-shimmer 2.2s linear infinite;
+}
+
+@keyframes status-shimmer {
+  to { background-position: 220% center; }
+}
 
 .footer {
   flex: 0 0 auto;

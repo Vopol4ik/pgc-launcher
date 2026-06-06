@@ -29,10 +29,14 @@ let logAnimating = false;
 let logLines = [];
 let logFlushScheduled = false;
 
-function setStatus(text, progress) {
-  statusText.textContent = text;
-  if (typeof progress === 'number') {
-    progressFill.style.width = `${Math.round(progress * 100)}%`;
+function setStatus(text, progress, updating) {
+  const payload = typeof text === 'object' && text !== null ? text : { text, progress, updating };
+  statusText.textContent = payload.text || '';
+  const isUpdating = Boolean(payload.updating);
+  statusText.classList.toggle('is-updating', isUpdating);
+  progressFill.classList.toggle('is-updating', isUpdating);
+  if (typeof payload.progress === 'number') {
+    progressFill.style.width = `${Math.round(payload.progress * 100)}%`;
   }
 }
 
@@ -218,7 +222,7 @@ logClear.addEventListener('click', () => {
 $('min-btn').addEventListener('click', () => window.svo.minimize());
 $('close-btn').addEventListener('click', () => window.svo.close());
 
-window.svo.onStatus((s) => setStatus(s.text, s.progress));
+window.svo.onStatus((s) => setStatus(s));
 window.svo.onLog((m) => appendLog(m));
 window.svo.onLaunched(() => {
   setStatus('Игра запущена. Приятной игры!', 1);
