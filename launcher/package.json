@@ -89,7 +89,7 @@
         }
       ],
       "icon": "build/icon.ico",
-      "artifactName": "Project Global Conflict Launcher Setup ${version}.${ext}"
+      "artifactName": "PGC Setup ${version}.${ext}"
     },
     "nsis": {
       "oneClick": false,

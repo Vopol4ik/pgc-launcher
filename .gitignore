@@ -4,6 +4,7 @@ github-updates/
 # Зависимости и сборка
 launcher/node_modules/
 launcher/release/
+launcher/release-build/
 launcher/src-recovered/
 launcher/resources/content.7z
 launcher/resources/modpack.dat

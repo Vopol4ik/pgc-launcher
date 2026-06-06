@@ -6,7 +6,8 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const versionFile = path.join(root, 'version.json');
 const meta = JSON.parse(fs.readFileSync(versionFile, 'utf8'));
-const { version, productName, clientModId } = meta;
+const { version, productName, installerName, clientModId } = meta;
+const setupName = installerName || productName;
 
 if (!/^\d+\.\d+\.\d+$/.test(version)) {
   console.error('version.json: нужен semver X.Y.Z');
@@ -25,7 +26,7 @@ setJson(path.join(root, 'launcher', 'package.json'), (pkg) => {
   pkg.build.nsis.shortcutName = productName;
   pkg.build.nsis.uninstallDisplayName = productName;
   if (!pkg.build.win) pkg.build.win = {};
-  pkg.build.win.artifactName = `${productName} Setup \${version}.\${ext}`;
+  pkg.build.win.artifactName = `${setupName} \${version}.\${ext}`;
 });
 
 const gradleProps = path.join(root, 'mod', 'gradle.properties');

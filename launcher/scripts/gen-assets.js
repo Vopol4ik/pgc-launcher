@@ -30,6 +30,28 @@ async function squareIcon(source, size) {
   return source.clone().crop(x, y, side, side).resize(size, size, Jimp.RESIZE_BICUBIC);
 }
 
+function applyRoundedMask(img, radiusRatio = 0.22) {
+  const { width, height } = img.bitmap;
+  const r = Math.max(2, Math.round(width * radiusRatio));
+  const r2 = r * r;
+  img.scan(0, 0, width, height, (x, y, idx) => {
+    let inside = true;
+    if (x < r && y < r) {
+      inside = (x - r + 1) ** 2 + (y - r + 1) ** 2 <= r2;
+    } else if (x >= width - r && y < r) {
+      inside = (x - (width - r)) ** 2 + (y - r + 1) ** 2 <= r2;
+    } else if (x < r && y >= height - r) {
+      inside = (x - r + 1) ** 2 + (y - (height - r)) ** 2 <= r2;
+    } else if (x >= width - r && y >= height - r) {
+      inside = (x - (width - r)) ** 2 + (y - (height - r)) ** 2 <= r2;
+    }
+    if (!inside) {
+      img.bitmap.data[idx + 3] = 0;
+    }
+  });
+  return img;
+}
+
 async function coverImage(source, width, height) {
   return source.clone().cover(width, height);
 }
@@ -85,7 +107,8 @@ async function main() {
   const pngPaths = [];
   for (const size of iconSizes) {
     const out = path.join(buildDir, `icon-${size}.png`);
-    const icon = await squareIcon(source, size);
+    let icon = await squareIcon(source, size);
+    icon = applyRoundedMask(icon, 0.22);
     await icon.writeAsync(out);
     pngPaths.push(out);
   }
