@@ -1,0 +1,43 @@
+
+[muzzle_flash]
+	#Enable muzzle-flash dynamic lighting when firing TaCZ guns.
+	enabled = true
+	#Light level of an unsuppressed muzzle flash (1..15).
+	#Range: 1 ~ 15
+	lightLevel = 14
+	#Light level when a silencer/suppressor is attached (1..15).
+	#Range: 1 ~ 15
+	silencedLightLevel = 7
+	#How many client ticks a muzzle flash stays lit (1 tick = 1/20 sec).
+	#Range: 1 ~ 20
+	durationTicks = 2
+
+[bullet_trail]
+	#Enable dynamic trail-light following TaCZ bullets in flight.
+	enabled = true
+
+[bullet_tracer]
+	#Distance in blocks between consecutive trail sparks.
+	#Range: 0.5 ~ 16.0
+	stepBlocks = 3.0
+	#How many ticks each spark stays lit (1 tick = 1/20 sec).
+	#Range: 1 ~ 20
+	ttlTicks = 3
+	#Light level emitted by each spark (1..15).
+	#Range: 1 ~ 15
+	lightLevel = 10
+
+[render]
+	#Global brightness multiplier applied to all new light sources.
+	#1.0 = use configured levels as-is.
+	#0.0 = effectively disable lighting without unloading the mixin.
+	#Range: 0.0 ~ 1.0
+	globalBrightnessScale = 1.0
+
+[internals]
+	#Soft cache size limit for silencer-detection per gun stack.
+	#Range: 16 ~ 4096
+	silenceCacheSize = 256
+	#If true, print active light-source counts to INFO log every 10 seconds.
+	debugLogStats = false
+

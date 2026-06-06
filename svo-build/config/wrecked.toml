@@ -1,0 +1,18 @@
+
+[General]
+	#Should wrecks be removed after some time?
+	autoRemoveOldWrecks = true
+	#After this amount of time wreck will be removed if autoRemoveOldWrecks is enabled (20 ticks = 1 second)
+	#Range: 1200 ~ 288000
+	wreckLifetimeTicks = 72000
+	#How much iron from a vehicle
+	#Range: 1 ~ 32
+	scrapPerVolume = 8
+	#Cutting speed multiplier
+	#Range: 0.1 ~ 10.0
+	cuttingSpeedMultiplier = 1.0
+	#Should smoke appear on destroyed vehicle?
+	spawnSmokeParticles = true
+	#List of vehicle IDs that should NOT leave wrecks. Example: ['superbwarfare:drone', 'superbwarfare:missile']
+	wreckBlacklist = ["superbwarfare:drone"]
+

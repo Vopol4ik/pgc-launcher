@@ -1,0 +1,221 @@
+
+[hud]
+	#Gun HUD style: TACZ_HUD (original), TACZ_P_HUD (custom immersive)
+	#Allowed Values: TACZ_HUD, TACZ_P_HUD
+	GunHudType = "TACZ_P_HUD"
+
+[hud_alerts]
+	#Vertical offset for HUD alerts from center
+	#Range: -500 ~ 500
+	AlertYOffset = 60
+	#Scale of HUD alert text
+	#Range: 0.1 ~ 5.0
+	AlertScale = 1.2
+	#Show 'NO AMMO' alert
+	NoAmmoEnabled = true
+	#Color for 'NO AMMO' (Hex format: #RRGGBB)
+	NoAmmoColor = "#FF5555"
+	#Show 'RELOAD' alert
+	ReloadEnabled = true
+	#Color for 'RELOAD' (Hex format: #RRGGBB)
+	ReloadColor = "#FF5555"
+	#Show 'LOW AMMO' alert
+	LowAmmoEnabled = true
+	#Color for 'LOW AMMO' (Hex format: #RRGGBB)
+	LowAmmoColor = "#FFAA00"
+
+[screen_shake]
+	#Camera shake intensity multiplier (0.0-5.0)
+	#Range: 0.0 ~ 5.0
+	ShakeMultiplier = 0.2
+	#Max camera shake intensity
+	#Range: 0.0 ~ 100.0
+	MaxShake = 15.0
+
+[fire_blur]
+	#Enable radial blur on screen edges when firing
+	Enabled = true
+	#Overlay opacity (0.0-1.0)
+	#Range: 0.0 ~ 1.0
+	Opacity = 0.2
+	#Maximum blur intensity (0.1-1.0)
+	#Range: 0.1 ~ 1.0
+	MaxIntensity = 0.15
+	#How fast the blur fades after firing (1 = very slow, 10 = very fast)
+	#Range: 1 ~ 10
+	FadeSpeed = 4
+
+[focus_overlay]
+	#Enable the focus overlay when aiming with a gun
+	Enabled = true
+	#Max opacity of the overlay (0.0-1.0)
+	#Range: 0.0 ~ 1.0
+	Opacity = 0.35
+
+[suppression_blur]
+	#Enable radial blur during suppression
+	Enabled = true
+	#Blur opacity (0.0-1.0)
+	#Range: 0.0 ~ 1.0
+	Opacity = 0.1
+	#Maximum blur intensity (0.1-1.0)
+	#Range: 0.1 ~ 1.0
+	MaxIntensity = 0.15
+	#How fast the blur fades (1 = very slow, 10 = very fast)
+	#Range: 1 ~ 10
+	FadeSpeed = 3
+
+[suppression]
+	#Enable suppression effects when bullets fly near you
+	Enabled = true
+	#Detection radius in blocks
+	#Range: 1.0 ~ 20.0
+	DetectionRadius = 5.0
+	#Intensity added per near-miss bullet
+	#Range: 0.01 ~ 1.0
+	IntensityPerBullet = 0.15
+	#Maximum suppression level
+	#Range: 0.1 ~ 1.0
+	MaxLevel = 0.45
+	#How fast suppression fades (1 = very slow, 10 = very fast)
+	#Range: 1 ~ 10
+	FadeSpeed = 4
+	#Enable camera shake from suppression
+	ShakeEnabled = true
+	#Maximum shake intensity in degrees
+	#Range: 0.0 ~ 2.0
+	ShakeMax = 0.35
+	#Suppression overlay opacity (0.0-1.0)
+	#Range: 0.0 ~ 1.0
+	OverlayOpacity = 0.65
+	#Allow your own bullets to suppress yourself (testing)
+	AllowSelfSuppression = false
+
+[impact_overlay]
+	#Enable debris overlay when bullets hit nearby blocks
+	Enabled = true
+	#Default detection range in blocks
+	#Range: 0.5 ~ 20.0
+	DefaultRange = 1.0
+	#Default intensity: LOW, MEDIUM, or HARD
+	DefaultIntensity = "LOW"
+	#Default max overlay state (0-4)
+	#Range: 0 ~ 4
+	DefaultMaxState = 1
+	#Overlay opacity (0.0-1.0)
+	#Range: 0.0 ~ 1.0
+	Opacity = 0.8
+	#Per-ammo overrides: 'ammoId=range,intensity' (e.g. ["tacz:50bmg=4,HARD"])
+	AmmoOverrides = ["tacz:50bmg=4,HARD", "tacz:12g=4,MEDIUM"]
+	#Ammo blacklist (e.g. ["tacz:rocket"])
+	AmmoBlacklist = []
+	#Block-to-category mappings: 'blockId=category', '#tag=category', or 'regex:pattern=category'
+	BlockOverrides = []
+
+[damage_overlay]
+	#Damage overlay mode: ALL, GUNS_ONLY, OFF
+	#Allowed Values: ALL, GUNS_ONLY, OFF
+	Mode = "ALL"
+
+[hit_overlay]
+	#Hit overlay mode: ALL, GUNS_ONLY, OFF
+	#Allowed Values: ALL, GUNS_ONLY, OFF
+	Mode = "ALL"
+	#Hit overlay opacity (0.0-1.0)
+	#Range: 0.0 ~ 1.0
+	Opacity = 0.8
+	#How fast the hit overlay fades (1 = slow, 10 = fast)
+	#Range: 1 ~ 10
+	FadeSpeed = 5
+
+[damage_indicator]
+	#Damage indicator mode: ALL, GUNS_ONLY, OFF
+	#Allowed Values: ALL, GUNS_ONLY, OFF
+	Mode = "ALL"
+	#Distance from crosshair (0.08-0.45)
+	#Range: 0.08 ~ 0.45
+	Radius = 0.3
+	#Base opacity (0.0-1.0)
+	#Range: 0.0 ~ 1.0
+	Opacity = 1.0
+	#Texture style: STYLE_1 (arc), STYLE_2 (gradient bar), STYLE_3 (chevron)
+	#Allowed Values: STYLE_1, STYLE_2, STYLE_3
+	Style = "STYLE_2"
+
+[sounds]
+	#Enable standard hit sound
+	EnableHitSound = true
+	#Enable super hit sound (high damage)
+	EnableSuperHitSound = true
+
+[muzzle_smoke]
+	#Enable muzzle smoke particles when firing
+	Enabled = true
+	#Initial velocity multiplier of muzzle smoke
+	#Range: 0.01 ~ 0.8
+	Speed = 0.14
+
+	[muzzle_smoke.smoke]
+		#Enable wispy extra smoke particles
+		Enabled = true
+		#Global visual scale of extra smoke
+		#Range: 0.05 ~ 4.0
+		Scale = 0.5
+		#Opacity of extra smoke (0.0-1.0)
+		#Range: 0.0 ~ 1.0
+		Opacity = 0.15
+		#Scale multiplier for pistols
+		#Range: 0.05 ~ 3.0
+		PistolScale = 0.5
+		#Scale multiplier for SMGs
+		#Range: 0.05 ~ 3.0
+		SmgScale = 0.72
+		#Scale multiplier for rifles
+		#Range: 0.05 ~ 3.0
+		RifleScale = 1.0
+		#Scale multiplier for shotguns
+		#Range: 0.05 ~ 3.0
+		ShotgunScale = 1.3
+		#Scale multiplier for snipers
+		#Range: 0.05 ~ 3.0
+		SniperScale = 3.0
+		#Scale multiplier for machine guns
+		#Range: 0.05 ~ 3.0
+		MgScale = 1.15
+		#Force heavy smoke style per ammo: 'tacz:ammo_id[,opacity|DEFAULT]'
+		ammo_heavy_smoke = []
+		#Force heavy smoke style per gun (takes priority over ammo): 'tacz:gun_id[,opacity|DEFAULT]'
+		gun_heavy_smoke = ["tacz:springfield1873,DEFAULT"]
+
+	[muzzle_smoke.dense_smoke]
+		#Experimental feature. Enable dense smoke by default
+		Enabled = false
+		#Global visual scale of dense muzzle smoke
+		#Range: 0.05 ~ 20.0
+		Scale = 0.2
+		#Opacity of dense smoke (0.0-1.0)
+		#Range: 0.0 ~ 1.0
+		Opacity = 0.8
+		#Scale multiplier for pistols
+		#Range: 0.05 ~ 20.0
+		PistolScale = 0.5
+		#Scale multiplier for SMGs
+		#Range: 0.05 ~ 20.0
+		SmgScale = 0.8
+		#Scale multiplier for rifles
+		#Range: 0.05 ~ 20.0
+		RifleScale = 1.0
+		#Scale multiplier for shotguns
+		#Range: 0.05 ~ 20.0
+		ShotgunScale = 1.0
+		#Scale multiplier for snipers
+		#Range: 0.05 ~ 20.0
+		SniperScale = 1.4
+		#Scale multiplier for machine guns
+		#Range: 0.05 ~ 20.0
+		MgScale = 0.7
+		#Force heavy dense style per ammo: 'tacz:ammo_id[,opacity|DEFAULT]'
+		ammo_heavy_smoke = ["tacz:50bmg,1.0"]
+		#Force heavy dense style per gun (takes priority over ammo): 'tacz:gun_id[,opacity|DEFAULT]'
+		gun_heavy_smoke = ["tacz:springfield1873,1.0"]
+

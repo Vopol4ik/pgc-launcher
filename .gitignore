@@ -1,0 +1,28 @@
+# Отдельный git-репозиторий (globalwar-updates)
+github-updates/
+
+# Зависимости и сборка
+launcher/node_modules/
+launcher/release/
+launcher/src-recovered/
+launcher/resources/content.7z
+launcher/resources/modpack.dat
+launcher/resources/.modpack-manifest-state.json
+
+# Кэши
+**/.gradle/
+**/build/tmp/
+mod/.gradle/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Логи
+*.log
+
+# Большие бинарники (качаются с GitHub Release)
+*.7z
+*.blockmap

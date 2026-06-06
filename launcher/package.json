@@ -1,0 +1,112 @@
+{
+  "name": "svo-launcher",
+  "version": "2.1.0",
+  "description": "Project Global Conflict Minecraft Launcher (Forge 1.20.1, offline)",
+  "author": "Project Global Conflict",
+  "license": "MIT",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "assets": "node scripts/gen-assets.js",
+    "sync-version": "node ../scripts/sync-version.js",
+    "predist": "npm run sync-version && node scripts/gen-assets.js && node scripts/ensure-content-meta.js",
+    "content": "node scripts/build-content-7z.js",
+    "manifest": "node scripts/build-modpack-manifest.js",
+    "manifest:bump": "node scripts/build-modpack-manifest.js --bump",
+    "publish:github": "node scripts/publish-github-updates.js",
+    "dist": "electron-builder --win --x64",
+    "dist:desktop": "npm run dist && node ../scripts/copy-installer-to-desktop.js",
+    "pack": "electron-builder --dir"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.17",
+    "minecraft-launcher-core": "^3.18.1",
+    "7zip-bin": "^5.2.0"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "jimp": "^0.22.12",
+    "png-to-ico": "^2.1.8"
+  },
+  "build": {
+    "appId": "io.pgc.launcher",
+    "productName": "Project Global Conflict Launcher",
+    "asar": true,
+    "asarUnpack": [
+      "**/node_modules/7zip-bin/**"
+    ],
+    "compression": "normal",
+    "afterPack": "scripts/after-pack.js",
+    "electronLanguages": [
+      "ru",
+      "en-US"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "src/**/*",
+      "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+      "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}"
+    ],
+    "extraResources": [
+      {
+        "from": "node_modules/7zip-bin/win/x64/7za.exe",
+        "to": "7za/7za.exe"
+      },
+      {
+        "from": "resources/content-meta.json",
+        "to": "content-meta.json"
+      },
+      {
+        "from": "resources/modpack-manifest.json",
+        "to": "modpack-manifest.json"
+      },
+      {
+        "from": "../svo-build/config",
+        "to": "svo-build/config",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../svo-build/options.txt",
+        "to": "svo-build/options.txt"
+      },
+      {
+        "from": "../svo-build/options-default.txt",
+        "to": "svo-build/options-default.txt"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico",
+      "artifactName": "Project Global Conflict Launcher Setup ${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Project Global Conflict Launcher",
+      "uninstallDisplayName": "Project Global Conflict Launcher",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "installerHeader": "build/installerHeader.bmp",
+      "installerSidebar": "build/installerSidebar.bmp",
+      "preCompressedFileExtensions": [
+        ".7z"
+      ]
+    }
+  }
+}

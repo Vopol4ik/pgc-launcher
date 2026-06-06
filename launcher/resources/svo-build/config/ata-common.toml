@@ -1,0 +1,160 @@
+
+["Spawn Settings"]
+	#Shahed spawn X coordinate
+	#Range: -30000000 ~ 30000000
+	spawnX = 0
+	#Shahed spawn Y coordinate (height)
+	#Range: 100 ~ 320
+	spawnY = 200
+	#Shahed spawn Z coordinate
+	#Range: -30000000 ~ 30000000
+	spawnZ = 0
+	#Target Y coordinate (attack height)
+	#Range: -64 ~ 320
+	targetYLevel = 64
+
+["Cost Settings"]
+	#Launch cost in coins
+	#Range: 0 ~ 64
+	launchCostCoins = 10
+
+["Blacklist Zones"]
+	#Enable blacklist (forbidden zones)
+	blacklistEnabled = false
+	#Forbidden zones for attacks
+	#Format: "x1,z1,x2,z2" where x1,z1 - first corner, x2,z2 - second corner
+	#Example: "0,0,100,100" forbids area from 0,0 to 100,100
+	forbiddenZones = ["160,771,-622,1011", "170,-1020,-420,-785", "-750,-600,-1145,-1015"]
+
+["Whitelist Zones"]
+	#Enable whitelist (allowed zones)
+	#If enabled, attacks are ONLY allowed inside whitelist zones
+	whitelistEnabled = false
+	#Allowed zones for attacks
+	#Format: "x1,z1,x2,z2" where x1,z1 - first corner, x2,z2 - second corner
+	#Attacks are ONLY allowed inside these zones (if whitelist is enabled)
+	whitelistZones = []
+
+["Explosion Effects"]
+	#Enable explosion particles
+	explosionParticlesEnabled = true
+	#Particle amount multiplier (0-500, 100 = default amount)
+	#Range: 0 ~ 500
+	explosionParticleMultiplier = 100
+	#Explosion breaks blocks
+	explosionBreaksBlocks = true
+	#Use custom explosion sounds
+	customExplosionSounds = true
+
+[Debug]
+	#Enable launch logging to console
+	loggingEnabled = false
+
+["Shahed Settings"]
+	#Cruise speed in blocks/tick (30 blocks/sec = 1.5)
+	#Range: 0.5 ~ 10.0
+	shahedCruiseSpeed = 1.5
+	#Dive speed in blocks/tick (72 blocks/sec = 3.6)
+	#Range: 1.0 ~ 15.0
+	shahedDiveSpeed = 3.6
+	#Minimum launch distance in blocks
+	#Range: 50 ~ 2000
+	shahedMinDistance = 600
+	#Maximum launch distance in blocks
+	#Range: 1000 ~ 30000
+	shahedMaxRange = 12000
+
+["Anti-Air Defense (TacZ Integration)"]
+	#Settings for shooting down Shahed drones with TacZ weapons
+	#Enable shooting down Shaheds with TacZ weapons
+	shahedShootdownEnabled = true
+	#Maximum health of Shahed drone (100 = default)
+	#Range: 10.0 ~ 1000.0
+	shahedMaxHealth = 100.0
+	#Global damage multiplier for all weapons (1.0 = normal)
+	#Range: 0.1 ~ 10.0
+	shahedDamageMultiplier = 1.0
+	#Damage multiplier for hits to engine (rear part)
+	#Range: 1.0 ~ 5.0
+	shahedEngineDamageMultiplier = 1.5
+	#Damage multiplier for hits to warhead (front part) - may cause detonation!
+	#Range: 1.0 ~ 10.0
+	shahedWarheadDamageMultiplier = 2.0
+	#Enable damage falloff based on distance (realistic)
+	shahedDistanceFalloff = true
+	#Minimum damage threshold - shots below this are ignored (filters weak weapons)
+	#Range: 0.0 ~ 20.0
+	shahedMinCaliberDamage = 2.0
+	#Show smoke effects when Shahed is damaged
+	shahedSmokeOnDamage = true
+	#Warhead hits at low HP can cause premature detonation
+	shahedCriticalDetonation = true
+
+["Iskander Settings"]
+	#Launch cost in coins for Iskander
+	#Range: 0 ~ 640
+	iskanderLaunchCost = 50
+	#Maximum flight height in blocks
+	#Range: 100.0 ~ 1500.0
+	iskanderApexHeight = 800.0
+	#Vertical speed during launch phase (blocks/tick)
+	#Range: 0.3 ~ 8.0
+	iskanderLaunchSpeed = 2.5
+	#Horizontal speed during cruise/ballistic phase (blocks/tick, 4.0 = 80 blocks/sec)
+	#Range: 0.5 ~ 30.0
+	iskanderCruiseSpeed = 4.0
+	#Speed during terminal dive phase (blocks/tick)
+	#Range: 1.0 ~ 40.0
+	iskanderTerminalSpeed = 5.0
+	#Preparation time before launch (ticks, 20 = 1 second). Default 140 = 7 seconds
+	#Range: 0 ~ 300
+	iskanderPrepareTicks = 140
+	#Duration of vertical launch phase (ticks, 20 = 1 sec). Default 60 = 3 seconds
+	#Range: 20 ~ 300
+	iskanderLaunchTicks = 60
+	#Circular Error Probable - target deviation in blocks
+	#Range: 0.0 ~ 50.0
+	iskanderKvoDeviation = 3.0
+	#Minimum launch distance for Iskander in blocks
+	#Range: 100 ~ 2000
+	iskanderMinDistance = 1000
+	#Maximum launch distance for Iskander in blocks
+	#Range: 500 ~ 10000
+	iskanderMaxRange = 5000
+	#Maximum flight height in blocks absolute Y coordinate (e.g. 600 means missile apex will not exceed Y=600)
+	#Range: 100 ~ 1500
+	iskanderMaxFlightHeight = 600
+	#Terminal dive angle in degrees (70-85 recommended)
+	#Range: 45.0 ~ 89.0
+	iskanderDiveAngle = 75.0
+	#Position of trajectory apex (0.3-0.6, where 0.5 = middle of flight)
+	#Range: 0.2 ~ 0.7
+	iskanderApexProgress = 0.4
+	#Speed of horizontal transition smoothing (0.05-0.3)
+	#Range: 0.02 ~ 0.5
+	iskanderHorizontalTransitionSpeed = 0.1
+
+["Explosion Damage Multipliers"]
+	#Multipliers applied to explosion damage per target category.
+	#1.0 = default damage. 2.0 = double damage. 0.5 = half damage.
+	#Vehicle category applies to SuperbWarfare/VVP vehicle entities (tanks, helicopters, planes).
+	#Entity category applies to all other non-player entities (mobs, animals, etc).
+	#Iskander: damage multiplier vs players
+	#Range: 0.0 ~ 20.0
+	iskanderPlayerDamageMultiplier = 1.0
+	#Iskander: damage multiplier vs mobs/entities (non-vehicle)
+	#Range: 0.0 ~ 20.0
+	iskanderEntityDamageMultiplier = 1.0
+	#Iskander: damage multiplier vs SuperbWarfare/VVP vehicles
+	#Range: 0.0 ~ 20.0
+	iskanderVehicleDamageMultiplier = 3.5
+	#Shahed: explosion damage multiplier vs players
+	#Range: 0.0 ~ 20.0
+	shahedExplosionPlayerMultiplier = 1.0
+	#Shahed: explosion damage multiplier vs mobs/entities (non-vehicle)
+	#Range: 0.0 ~ 20.0
+	shahedExplosionEntityMultiplier = 1.0
+	#Shahed: explosion damage multiplier vs SuperbWarfare/VVP vehicles
+	#Range: 0.0 ~ 20.0
+	shahedExplosionVehicleMultiplier = 3.5
+

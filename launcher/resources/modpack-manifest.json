@@ -1,0 +1,582 @@
+{
+  "revision": 17,
+  "builtAt": "2026-06-04T16:29:36.951Z",
+  "baseUrl": null,
+  "files": [
+    {
+      "path": "mods/air-tactical-arsenal-1.1.0.jar",
+      "sha256": "28c75688fc995ceb0217a338bdaf8291030b2319c167228277851a586c0276be",
+      "size": 2982872,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__air-tactical-arsenal-1.1.0.jar"
+    },
+    {
+      "path": "mods/BadOptimizations-2.4.1-1.20.1.jar",
+      "sha256": "3da53cdf856757d9ec7df0be86bc23b2c7d67a019b490f8f64317d4d9b77cac8",
+      "size": 460234,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__BadOptimizations-2.4.1-1.20.1.jar"
+    },
+    {
+      "path": "mods/BeyondHorizons IV-1.0.1.jar",
+      "sha256": "54754a8784e759382eb2f89a774efe8b52c42c6c2477c5e3c225af8bb9417390",
+      "size": 94725,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__BeyondHorizons.IV-1.0.1.jar"
+    },
+    {
+      "path": "mods/C.M.A_Transport_Pack _v.3.3-1.20.1.jar",
+      "sha256": "c2b9abdb747d6bbaf2567e86e2501dcfa3dae4f62c54335343f19ef2aac499a2",
+      "size": 118528306,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__C.M.A_Transport_Pack._v.3.3-1.20.1.jar"
+    },
+    {
+      "path": "mods/Chunky-1.3.146.jar",
+      "sha256": "996a3c9b53e6c0e0850fb9e78d3546d2c37a1b789ddaf529b17e4fe62ab23141",
+      "size": 341451,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__Chunky-1.3.146.jar"
+    },
+    {
+      "path": "mods/cloth-config-11.1.136-forge.jar",
+      "sha256": "1e895e85cf5b1e1905ef3178ec155c8badfe22a1577b92c09143a5aa1f4ce0f2",
+      "size": 1181413,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__cloth-config-11.1.136-forge.jar"
+    },
+    {
+      "path": "mods/coroutil-forge-1.20.1-1.3.7.jar",
+      "sha256": "11448808a42c17425cf2ea39701841008683d6ad6e2838a34eef0253251a870f",
+      "size": 64187,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__coroutil-forge-1.20.1-1.3.7.jar"
+    },
+    {
+      "path": "mods/CreativeCore_FORGE_v2.12.38_mc1.20.1.jar",
+      "sha256": "629afffc34377f27813466a5b8e9e83b5aea198462ff776780776be4693a7ead",
+      "size": 1144069,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__CreativeCore_FORGE_v2.12.38_mc1.20.1.jar"
+    },
+    {
+      "path": "mods/curios-forge-5.14.1+1.20.1.jar",
+      "sha256": "1e817919a35b37cf30524aaec73f0ca5130452f23f168f844854df282eb8e51f",
+      "size": 398066,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__curios-forge-5.14.1+1.20.1.jar"
+    },
+    {
+      "path": "mods/DeltaForce Melee Pack-0.2.0.jar",
+      "sha256": "e0ccce77d58d0e480aedbebf50234c11ac19cc79016fab477232cb9cec4aaf0b",
+      "size": 10380850,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__DeltaForce.Melee.Pack-0.2.0.jar"
+    },
+    {
+      "path": "mods/DistantHorizons-3.0.3-b-1.20.1-fabric-forge.jar",
+      "sha256": "591c07d649dde7669b1e8d9a53e89a8bc3aa0b9b7e4d768c2209017b02193356",
+      "size": 29467253,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__DistantHorizons-3.0.3-b-1.20.1-fabric-forge.jar"
+    },
+    {
+      "path": "mods/dynamic-fps-3.11.4+minecraft-1.20.0-forge.jar",
+      "sha256": "b0ecdf3a0619208441062ceeebce79256223ac4e341844a09a6859170d671920",
+      "size": 402345,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__dynamic-fps-3.11.4+minecraft-1.20.0-forge.jar"
+    },
+    {
+      "path": "mods/ecf-1.0.0.jar",
+      "sha256": "fd9e1bb739fdf3eac7f6bbf7957b7d6111f8b054228b4dff274e31ca4c8092bf",
+      "size": 1120858,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__ecf-1.0.0.jar"
+    },
+    {
+      "path": "mods/ecf-1.0.1.jar",
+      "sha256": "fd9e1bb739fdf3eac7f6bbf7957b7d6111f8b054228b4dff274e31ca4c8092bf",
+      "size": 1120858,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__ecf-1.0.1.jar"
+    },
+    {
+      "path": "mods/embeddium-0.3.31+mc1.20.1.jar",
+      "sha256": "eed3d1325f2acc2fd4e69bb495e5ccb91d962126ac5330f0582ebc2a3daf47fb",
+      "size": 1320675,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__embeddium-0.3.31+mc1.20.1.jar"
+    },
+    {
+      "path": "mods/entityculling-forge-1.10.2-mc1.20.1.jar",
+      "sha256": "34da8e10cf31ade2b86b02e4f55c4d3b480a0992148ac12f9ec49eb7be4bfda0",
+      "size": 1587585,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__entityculling-forge-1.10.2-mc1.20.1.jar"
+    },
+    {
+      "path": "mods/Explosion-Overhaul-0.2.3.0-forge-.jar",
+      "sha256": "feac2ed262604f01e74609acdeba83c9b0bbe2b602ba0da40196fb1041f2c64f",
+      "size": 84444256,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__Explosion-Overhaul-0.2.3.0-forge-.jar"
+    },
+    {
+      "path": "mods/Fastload-Reforged-mc1.20.1-3.4.0.jar",
+      "sha256": "038a5fa1c044d5afae22502ca1444eeb1a700d34a224996c25f233524ae35a7a",
+      "size": 66989,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__Fastload-Reforged-mc1.20.1-3.4.0.jar"
+    },
+    {
+      "path": "mods/ferritecore-6.0.1-forge.jar",
+      "sha256": "9c2c9396a49e796d88497758caa4637d2bcbb433c318e2dd9cebcffbaf0f6c54",
+      "size": 123034,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__ferritecore-6.0.1-forge.jar"
+    },
+    {
+      "path": "mods/Forgematica-0.1.13-mc1.20.1.jar",
+      "sha256": "d2c7c9c9075ee4bd6a60e75bfcb14ea397a054ec441029960fc6890f330e539f",
+      "size": 997501,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__Forgematica-0.1.13-mc1.20.1.jar"
+    },
+    {
+      "path": "mods/FpsReducer2-forge-1.20.1-2.5.1.jar",
+      "sha256": "997f034210e0fca20fa5a0e6ddd370c5444854fc97e69910161104160cea41ce",
+      "size": 125660,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__FpsReducer2-forge-1.20.1-2.5.1.jar"
+    },
+    {
+      "path": "mods/FPVtoMinecraft-1.20.1-V1.1.4.jar",
+      "sha256": "f286f5b7aa287831d32f21ccc790d2d6a0b26723d3d3e3d65d84d475578ecb38",
+      "size": 2128007,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__FPVtoMinecraft-1.20.1-V1.1.4.jar"
+    },
+    {
+      "path": "mods/fzzy_config-0.7.6+1.20.1+forge.jar",
+      "sha256": "d39cd5d6b23b86468937e306776dc70faba900072c7e359ce9348d8a3c26982e",
+      "size": 2374667,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__fzzy_config-0.7.6+1.20.1+forge.jar"
+    },
+    {
+      "path": "mods/geckolib-forge-1.20.1-4.8.3.jar",
+      "sha256": "477d5d014d6641522cd0deb93c66aefff755760259970c4c255fadb3d88ff702",
+      "size": 1039047,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__geckolib-forge-1.20.1-4.8.3.jar"
+    },
+    {
+      "path": "mods/Gunfire Overhaul-0.1.6-a.jar",
+      "sha256": "dab997ea3593b110f8220abd4a90038e0a431cac5900a6ec60f6f2212fca9aa6",
+      "size": 6125997,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__Gunfire.Overhaul-0.1.6-a.jar"
+    },
+    {
+      "path": "mods/IAV-1.1.11-1.20.1.jar",
+      "sha256": "a8d3883d384db4ce637547e314de7da6d58408bb05f1d25e5abf24a4a388d8ab",
+      "size": 49393551,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__IAV-1.1.11-1.20.1.jar"
+    },
+    {
+      "path": "mods/Icterine-forge-1.20.0-1-1.3.0.jar",
+      "sha256": "5f3d366c74d2f5b9a30268f5fa7b41de711069752b4d328899752d037c146ff3",
+      "size": 38848,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__Icterine-forge-1.20.0-1-1.3.0.jar"
+    },
+    {
+      "path": "mods/ImmediatelyFast-Forge-1.5.4+1.20.4.jar",
+      "sha256": "da781a31b2c8d8a845ed48c89b6463f1df3f2c655de10d8d4f5bed8123ff68a8",
+      "size": 538992,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__ImmediatelyFast-Forge-1.5.4+1.20.4.jar"
+    },
+    {
+      "path": "mods/Immersive Vehicles-1.20.1-24.0.0.jar",
+      "sha256": "274c68a6b6cf9bd5fd97af8358ce2d58fed2a49685f20079d744e8b74800277b",
+      "size": 6254897,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__Immersive.Vehicles-1.20.1-24.0.0.jar"
+    },
+    {
+      "path": "mods/immersive_ballistic-1.3.jar",
+      "sha256": "b1d037714bb106e02476b97976e5d8245b321b5541a97cc4c06f2d24b542539e",
+      "size": 6939506,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__immersive_ballistic-1.3.jar"
+    },
+    {
+      "path": "mods/immersive_optimization-forge-1.20.1-0.1.5.jar",
+      "sha256": "374b9d30cf8e3fe9328855f6c15c4fb49f26ee933fa6ad3a030eed7195eff517",
+      "size": 55179,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__immersive_optimization-forge-1.20.1-0.1.5.jar"
+    },
+    {
+      "path": "mods/itemphysicguns-1.0.3-7686b43.jar",
+      "sha256": "ebd6e5957521fa8a1bc29dcc7f157e56c6ea0332d5302a8d66975381f06d607a",
+      "size": 25829,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__itemphysicguns-1.0.3-7686b43.jar"
+    },
+    {
+      "path": "mods/ItemPhysicLite_FORGE_v1.6.10_mc1.20.1.jar",
+      "sha256": "8cc804abfe867fbcc7b8ecc6775ff5065e896abf01f231b23b344af412d97c74",
+      "size": 19504,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__ItemPhysicLite_FORGE_v1.6.10_mc1.20.1.jar"
+    },
+    {
+      "path": "mods/Kiwi-1.20.1-Forge-11.10.2.jar",
+      "sha256": "cbe7664e7502c199526df0882bba4fa34157cb9a4f016ed0b975ed221940665d",
+      "size": 1677323,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__Kiwi-1.20.1-Forge-11.10.2.jar"
+    },
+    {
+      "path": "mods/kotlinforforge-4.12.0-all.jar",
+      "sha256": "6a66c6a68ec09f8717cdbf06883394f0ee24d7cd826b7134a0f81839e8e720ae",
+      "size": 7442998,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__kotlinforforge-4.12.0-all.jar"
+    },
+    {
+      "path": "mods/LAV-1.16.5-V1.jar",
+      "sha256": "3d5b81ff3ddd4b22aa15c847820a7cde7a27ea51f0d91bc62efcc370685e9d4b",
+      "size": 4586795,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__LAV-1.16.5-V1.jar"
+    },
+    {
+      "path": "mods/lexiconfig-forge-1.4.18-1.jar",
+      "sha256": "58362ec29cd96508a716bdc43c4e31be6413dea6b6c6c165b9950b51f02e9b27",
+      "size": 54205,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__lexiconfig-forge-1.4.18-1.jar"
+    },
+    {
+      "path": "mods/lindqvist-1.16.5-3.2.jar",
+      "sha256": "c227ad1eecc5bbf9011c0d55bf204b045bba00eb1f2d37aed9696021214c96cb",
+      "size": 178252651,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__lindqvist-1.16.5-3.2.jar"
+    },
+    {
+      "path": "mods/lrtactical-1.20.1-0.4.1.jar",
+      "sha256": "42f3b2f5a4194baa10ce76720b5770290a64105634f0dcd9182fc0ef33800e6e",
+      "size": 5439652,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__lrtactical-1.20.1-0.4.1.jar"
+    },
+    {
+      "path": "mods/LuckPerms-Forge-5.4.102.jar",
+      "sha256": "935beff65a4d248880e004ccb5fc2f1cc5d63d3f24870ff8d472cbefa31016da",
+      "size": 1398478,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__LuckPerms-Forge-5.4.102.jar"
+    },
+    {
+      "path": "mods/MaFgLib-0.1.13-mc1.20.1.jar",
+      "sha256": "ab7cc18b455edf4a186135a0b1a0931f469ea936831599e836c48e50eb325988",
+      "size": 521351,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__MaFgLib-0.1.13-mc1.20.1.jar"
+    },
+    {
+      "path": "mods/memoryleakfix-forge-1.17+-1.1.5.jar",
+      "sha256": "925c3db4e1d085a43c4d2beaa4eec18367c22abc90c2ce8594b8a129fd3f28dd",
+      "size": 227925,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__memoryleakfix-forge-1.17+-1.1.5.jar"
+    },
+    {
+      "path": "mods/mm_armor-1.1.0-forge-1.20.1.jar",
+      "sha256": "593a8ec64879a60d01bd554be92d2a7eb37f80d67ada37d33ec0685e335e7290",
+      "size": 16406402,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__mm_armor-1.1.0-forge-1.20.1.jar"
+    },
+    {
+      "path": "mods/mobtimizations-forge-1.20.1-1.0.0.jar",
+      "sha256": "660413c817a9e4081979bf4fde7ecb802490933383e4eba67ab9d33ca7f60c54",
+      "size": 22739,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__mobtimizations-forge-1.20.1-1.0.0.jar"
+    },
+    {
+      "path": "mods/modelfix-1.15.jar",
+      "sha256": "35f27982242a3ea58c526204a28704ddf355d19bb2e9b0ff10f9585c255a4f16",
+      "size": 45246,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__modelfix-1.15.jar"
+    },
+    {
+      "path": "mods/modernfix-forge-5.27.40+mc1.20.1.jar",
+      "sha256": "0061a53c0335693318073788c57c5288f5b8b5b3918c7561f5fb7860a394611f",
+      "size": 970410,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__modernfix-forge-5.27.40+mc1.20.1.jar"
+    },
+    {
+      "path": "mods/MRU-1.0.4+1.20.1+forge(1).jar",
+      "sha256": "520c07bceb8987c4bb355d32b495ae03e4f106553df47b1a9691a08420016fa2",
+      "size": 287393,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__MRU-1.0.4+1.20.1+forge.1.jar"
+    },
+    {
+      "path": "mods/MTS Official Pack-1.20.1-V29.jar",
+      "sha256": "a6ca5d37a89fd398cafd96fc8f87673cec5b0247c1651bc0b9f02b23f86c7908",
+      "size": 70997298,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__MTS.Official.Pack-1.20.1-V29.jar"
+    },
+    {
+      "path": "mods/OAmP-1.20.1-V3.jar",
+      "sha256": "cd7791049191317f332f8b8b2dc89ae77eb733d0921fcf1b521f56907293073d",
+      "size": 24285160,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__OAmP-1.20.1-V3.jar"
+    },
+    {
+      "path": "mods/oculus-mc1.20.1-1.8.0.jar",
+      "sha256": "0945df0cba0f62b3901dd80c3268e5311b770ece78c78037a45db12ac0425fef",
+      "size": 2851119,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__oculus-mc1.20.1-1.8.0.jar"
+    },
+    {
+      "path": "mods/optileaves-1.20.x-1.2.jar",
+      "sha256": "9b01c629a47057cf9b22adfdb005d4cfd7886dfdfd8b8a37d18f19652a4e6a30",
+      "size": 20415,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__optileaves-1.20.x-1.2.jar"
+    },
+    {
+      "path": "mods/packetfixer-3.3.2-1.18-1.20.4-merged.jar",
+      "sha256": "12f96ecb8e61e0b3d3f0ca5701f479904904501dd251aa7bb60205afdf6bc2ce",
+      "size": 188661,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__packetfixer-3.3.2-1.18-1.20.4-merged.jar"
+    },
+    {
+      "path": "mods/particle_core-0.3.3+1.20.1+forge.jar",
+      "sha256": "bd4023e4618333f3e6020a7d6f4db3ae7e8fe41b39a43f47e6a1da4fbd80bc1b",
+      "size": 773448,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__particle_core-0.3.3+1.20.1+forge.jar"
+    },
+    {
+      "path": "mods/PassableFoliage-1.20.1-forge-8.2.1.jar",
+      "sha256": "15c215f1782c21f1ee1295eae3a5e96386eefc790247f5f32bd74893b967ec14",
+      "size": 30618,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__PassableFoliage-1.20.1-forge-8.2.1.jar"
+    },
+    {
+      "path": "mods/PeakStamina-Forge-1.9.19-1.20.1.jar",
+      "sha256": "24ded64c857d15eb526429fec55e261a43b1b4bafba83261c3173b52a4ddece6",
+      "size": 161577,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__PeakStamina-Forge-1.9.19-1.20.1.jar"
+    },
+    {
+      "path": "mods/pgcclient-2.0.0.jar",
+      "sha256": "2031286a2cf2faa6612704671740e44e0c27a2cbe812a82aff6ee3765d252c90",
+      "size": 2410417,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__pgcclient-2.0.0.jar"
+    },
+    {
+      "path": "mods/pgcclient-2.1.0.jar",
+      "sha256": "2031286a2cf2faa6612704671740e44e0c27a2cbe812a82aff6ee3765d252c90",
+      "size": 2410417,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__pgcclient-2.1.0.jar"
+    },
+    {
+      "path": "mods/player-animation-lib-forge-1.0.2-rc1+1.20.jar",
+      "sha256": "90d9965cb9efdbda29fdc5610be3914cf7008bf5c392ff34f7ab25f96a852691",
+      "size": 181437,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__player-animation-lib-forge-1.0.2-rc1+1.20.jar"
+    },
+    {
+      "path": "mods/playerrevive_compat-1.0.2-12c699b.jar",
+      "sha256": "76ec5561fbc77ca206416e7370be4d408797f2e488024173f112113d27faf462",
+      "size": 198220,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__playerrevive_compat-1.0.2-12c699b.jar"
+    },
+    {
+      "path": "mods/PlayerRevive_FORGE_v2.0.31_mc1.20.1.jar",
+      "sha256": "beeb560232c8ee691ea446d53194358902eed8ed38d198515906ac724bdde1fb",
+      "size": 5298162,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__PlayerRevive_FORGE_v2.0.31_mc1.20.1.jar"
+    },
+    {
+      "path": "mods/PresenceFootsteps-1.20.1-1.9.1-beta.1.jar",
+      "sha256": "447dd543e178a9454ccf3bf0d9d7bd7957b1af6da9d74f2cd3d9b5fbe8548e98",
+      "size": 7080698,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__PresenceFootsteps-1.20.1-1.9.1-beta.1.jar"
+    },
+    {
+      "path": "mods/PWIC-0.2.4-beta_fixed.jar",
+      "sha256": "be4563d336fe873c1cea220de828a66fca70e02083cfb17c1cf9891678c7a748",
+      "size": 29224138,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__PWIC-0.2.4-beta_fixed.jar"
+    },
+    {
+      "path": "mods/qmp1.20.1_2_player_v0_0_4_7_beta.jar",
+      "sha256": "bfc9808c64363ccf6ddb128d1bd60d029789b6bce999d7a18bfcd46346be380b",
+      "size": 70690314,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__qmp1.20.1_2_player_v0_0_4_7_beta.jar"
+    },
+    {
+      "path": "mods/radium-mc1.20.1-0.12.4+git.26c9d8e.jar",
+      "sha256": "b42584e2672d6b5329959ec2b0f342395b19389fed0ee4d86ea71072f42f77a0",
+      "size": 713454,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__radium-mc1.20.1-0.12.4+git.26c9d8e.jar"
+    },
+    {
+      "path": "mods/ragdollified-1.20.1-0.1.7-BETA-HotFix.jar",
+      "sha256": "975d6da619c6ec9e2f144899a67e449219a14bb145af8d9354cb97343fe09138",
+      "size": 889584,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__ragdollified-1.20.1-0.1.7-BETA-HotFix.jar"
+    },
+    {
+      "path": "mods/S.L.O.P. Vehicle Pack 1.20.1-1.5.1.jar",
+      "sha256": "d5173c9c55cd6dc274ada9847021c2907544a028b4a7f87f907d362b98662878",
+      "size": 5801212,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__S.L.O.P..Vehicle.Pack.1.20.1-1.5.1.jar"
+    },
+    {
+      "path": "mods/shadedwar-2.4.0-BETA.309.jar",
+      "sha256": "911106254e8e1689abf9b4e5ebd1f67a3d98c0e981b3558d6741785258419bba",
+      "size": 3887903,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__shadedwar-2.4.0-BETA.309.jar"
+    },
+    {
+      "path": "mods/simpleradio-forge-1.20.1-3.4.6.jar",
+      "sha256": "a0ec78e4c7d9f53e4c7a2831fcc8d1ee6199af4d5b9b557b587d8396aa12ba91",
+      "size": 1076746,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__simpleradio-forge-1.20.1-3.4.6.jar"
+    },
+    {
+      "path": "mods/skinrestorer-2.7.0+1.20-forge.jar",
+      "sha256": "7795a3e28f0f9cb8ef58b0a7bcdeddaa35e7ed660042c7573d5fb5ea145acc1b",
+      "size": 250394,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__skinrestorer-2.7.0+1.20-forge.jar"
+    },
+    {
+      "path": "mods/sound-physics-remastered-forge-1.20.1-1.5.1.jar",
+      "sha256": "1d7a0d4cdbdee61532dd23ddbc2833292e945d8ec2d20f3271af86b02b0fc108",
+      "size": 206984,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__sound-physics-remastered-forge-1.20.1-1.5.1.jar"
+    },
+    {
+      "path": "mods/Sounds-2.2.1+1.20.1+forge.jar",
+      "sha256": "2fa22c59f967e963c97e7d4374a8713247402fa6c87654b3057a1c248217c7fd",
+      "size": 10974911,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__Sounds-2.2.1+1.20.1+forge.jar"
+    },
+    {
+      "path": "mods/superbwarfare-0.8.9-final-mc1.20.1-6effe4385-all.jar",
+      "sha256": "6eece0df9c927bddee3bd373fe90a2bbcba7157e9408ee0f94d13e04dc638395",
+      "size": 31691008,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__superbwarfare-0.8.9-final-mc1.20.1-6effe4385-all.jar"
+    },
+    {
+      "path": "mods/survival_instinct-1.0.2-forge-1.20.1.jar",
+      "sha256": "9f73d8ec5fcf6bb6641f46c0484c63dbfc4ed883c73f7dbbad38de8fcc753e62",
+      "size": 2136620,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__survival_instinct-1.0.2-forge-1.20.1.jar"
+    },
+    {
+      "path": "mods/tacz_presence-1.4.jar",
+      "sha256": "2384bb4b3df41999c586aaf0d35ea33c477fad6a520985e78ba99d735823dea4",
+      "size": 3866215,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__tacz_presence-1.4.jar"
+    },
+    {
+      "path": "mods/tacz_x_guns_lights_addon-2.4.3.jar",
+      "sha256": "c8d92bb0ae9a2871e59d096d499139cc72ce3122d218a0a2497dd5e461fc5a0a",
+      "size": 91157,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__tacz_x_guns_lights_addon-2.4.3.jar"
+    },
+    {
+      "path": "mods/tacz-1.20.1-1.1.8-hotfix.jar",
+      "sha256": "9ed8ada1283ed7a793a70cc1b51c4a340f367ce84707e1a7b8cf21ee3d288d77",
+      "size": 57465167,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__tacz-1.20.1-1.1.8-hotfix.jar"
+    },
+    {
+      "path": "mods/tacz-tweaks-2.14.1-all.jar",
+      "sha256": "ecc15cedbae26ff2620fa3ce7614f1bbd6325e7317c412945a9a3a109aecb21a",
+      "size": 1929747,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__tacz-tweaks-2.14.1-all.jar"
+    },
+    {
+      "path": "mods/taczadditions-1.20.1-1.0.0-hotfix.jar",
+      "sha256": "032e170f594ea17d79c1e2411c8bce3de8596c479f937e4da44121e49cd0b80d",
+      "size": 74666,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__taczadditions-1.20.1-1.0.0-hotfix.jar"
+    },
+    {
+      "path": "mods/TexelArsenal_1.16.5_1.2.jar",
+      "sha256": "9f3e4414ad6dea7b17161a1e3201c1cb01d8f0c1443417721191bad93a6e6c41",
+      "size": 44283513,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__TexelArsenal_1.16.5_1.2.jar"
+    },
+    {
+      "path": "mods/TextAnimator-1.20.1-Forge-2.5.4.jar",
+      "sha256": "baa404db8e7c1eb94198595e00a72d7cfec98a340901b78f41dd7d83168fc515",
+      "size": 236779,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__TextAnimator-1.20.1-Forge-2.5.4.jar"
+    },
+    {
+      "path": "mods/tl_skin_cape_forge_1.20-1.38.jar",
+      "sha256": "a6aa1286aa847ff9b6029c8901bbad30e05b4bcbc967142125c35499dfe5f5d3",
+      "size": 1180127,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__tl_skin_cape_forge_1.20-1.38.jar"
+    },
+    {
+      "path": "mods/VEB-1.1.11-1.20.1.jar",
+      "sha256": "efcd65679fde840335fedf3fc04a0535063ab9f56d2dfbaa32621f4d19274511",
+      "size": 66073559,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__VEB-1.1.11-1.20.1.jar"
+    },
+    {
+      "path": "mods/voicechat-forge-1.20.1-2.6.18.jar",
+      "sha256": "536c513a49fbbd64a5de45fa76ba4d6880266353170ab274f1c741bf215b1ddf",
+      "size": 4903916,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__voicechat-forge-1.20.1-2.6.18.jar"
+    },
+    {
+      "path": "mods/worldedit-mod-7.2.15(1).jar",
+      "sha256": "17db6b3e94f52d25426684663e1e1846823cbb7907f1c365ac329e5bc7bfaf2c",
+      "size": 5825402,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__worldedit-mod-7.2.15.1.jar"
+    },
+    {
+      "path": "mods/WRB-Armor-0.4.1.jar",
+      "sha256": "0f79b2731c6d158e896c0950586c763756eb08b176daf7e3406a1e4539619fcb",
+      "size": 934785,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__WRB-Armor-0.4.1.jar"
+    },
+    {
+      "path": "mods/xaerominimap-forge-1.20.1-25.3.13.jar",
+      "sha256": "107a686c1a1637998c8ce7fa2262bb8c36f24277d6b2cf4b512a0b176ff41e89",
+      "size": 2147217,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__xaerominimap-forge-1.20.1-25.3.13.jar"
+    },
+    {
+      "path": "mods/xaeroworldmap-forge-1.20.1-1.40.16.jar",
+      "sha256": "49fbf2a0c91ca7e161b17f3b1784d4e798d0cd19f361ad3ebf6613e559f6371d",
+      "size": 1389566,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__xaeroworldmap-forge-1.20.1-1.40.16.jar"
+    },
+    {
+      "path": "mods/yet_another_config_lib_v3-3.6.6+1.20.1-forge.jar",
+      "sha256": "bd05da3d9df29b914165583f1c6dfd918a138996447ff32c0418329824027a8f",
+      "size": 1105891,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__yet_another_config_lib_v3-3.6.6+1.20.1-forge.jar"
+    },
+    {
+      "path": "mods/Zero ordinary vehicles-V2.2_1.20.1-26.1.jar",
+      "sha256": "30dd41ecebd9a7cbca0bd8283b1c8172ad0d4397e9b9921e09d388f095a02923",
+      "size": 45956787,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__Zero.ordinary.vehicles-V2.2_1.20.1-26.1.jar"
+    },
+    {
+      "path": "shaderpacks/BSL_v10.1.3.zip",
+      "sha256": "185774628b5259c36255183fc1adeb0f64f89235f7ea2c826fa327d1112687a8",
+      "size": 1127026,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/shaderpacks__BSL_v10.1.3.zip"
+    },
+    {
+      "path": "shaderpacks/ComplementaryReimagined_r5.8.1.zip",
+      "sha256": "3f1cd389e717b2e62f58edff222059b9c60de71b14bb49b517eb58318ce35b15",
+      "size": 546925,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/shaderpacks__ComplementaryReimagined_r5.8.1.zip"
+    },
+    {
+      "path": "shaderpacks/photon_v1.0.zip",
+      "sha256": "d639a6c29e77603b645e71d2c5a4f0af75b5e179897c1e1ed7762edc2d34d2cd",
+      "size": 1558820,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/shaderpacks__photon_v1.0.zip"
+    },
+    {
+      "path": "shaderpacks/photon_v1.2.zip",
+      "sha256": "0b44532067ec10cb4cc6840471fcb035309a5c63b467dfde49c60f55025092ab",
+      "size": 3737464,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/shaderpacks__photon_v1.2.zip"
+    },
+    {
+      "path": "shaderpacks/Solas Shader V3.6.zip",
+      "sha256": "6d6f1065cbe2310b8246b7a702eeda651428ce2a6b742540f014e8e7b640a2ad",
+      "size": 1229545,
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/shaderpacks__Solas.Shader.V3.6.zip"
+    }
+  ],
+  "remove": [
+    "mods/CameraOverhaul-v2.1.1-forge+mc[1.20-1.20.5].jar",
+    "mods/MCSP-1.20.1-V1.0.8(1).jar",
+    "mods/Wrecked-1.1.2.jar",
+    "mods/bfcrr-1.0.jar",
+    "mods/dragonrise_reforge-1.3.0.jar",
+    "mods/pgcclient-2.0.0.jar",
+    "mods/superbwarfare-1.20.1-0.8.8-final-6a6b54795.jar",
+    "mods/vvp-beta-1.20.1-0.2.0.jar",
+    "mods/ywzj_vehicle-1.20.1-0.5.4.2-all.jar"
+  ]
+}

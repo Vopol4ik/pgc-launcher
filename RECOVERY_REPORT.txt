@@ -1,0 +1,90 @@
+﻿SVO LAUNCHER RECOVERY REPORT
+Generated: 2026-06-07 00:09:02
+Final setup completed: 2026-06-07 (automated setup pass)
+
+=== STEP 1: Test-Path ===
+C:\Users\Intel\Desktop\svoLauncher : True (project restored)
+C:\Users\Intel\AppData\Local\Programs\Project Global Conflict Launcher : True
+C:\Users\Intel\Desktop\Project Global Conflict Launcher Setup 2.1.0.exe : True (rebuilt)
+
+=== STEP 2: Installed launcher resources ===
+Source: C:\Users\Intel\AppData\Local\Programs\Project Global Conflict Launcher\resources
+Key files:
+  app.asar (4092246 bytes) - EXTRACTED OK
+  modpack-manifest.json (29354 bytes) - COPIED
+  content-meta.json (450 bytes) - COPIED
+  7za/7za.exe (1231360 bytes) - COPIED
+  svo-build/ (config + options) - COPIED
+  app.asar.unpacked/node_modules/7zip-bin - NOT copied (runtime unpack; dev uses npm 7zip-bin)
+  elevate.exe - NOT copied (electron-builder helper)
+
+Extract command:
+  npx @electron/asar extract ... -> C:\Users\Intel\Desktop\svoLauncher\launcher\src-recovered
+  Exit code: 0
+  npm install -g @electron/asar: completed
+
+Recovered application source (21 files under src/):
+  main.js, preload.js, launcher-core.js, modpack-sync.js, content-pack.js, download.js,
+  config.js, paths.js, java-runtime.js, github-updates.js, archive-7z.js, cpu-limit.js,
+  game-options.js, gpu-env.js, errors.js, renderer/*, assets/*
+
+package.json from asar:
+  name: svo-launcher, version: 2.1.0, main: src/main.js
+  deps: adm-zip, minecraft-launcher-core, 7zip-bin
+
+=== STEP 3: Git clone ===
+git clone https://github.com/Vopol4ik/globalwar-updates.git
+  -> C:\Users\Intel\Desktop\svoLauncher\github-updates
+  HEAD: 850fc22 modpack manifest sync for launcher 2.1.0 content build
+  Contents: modpack-manifest.json, README.md (manifest-only repo, not mod Java source)
+
+=== STEP 4: content.7z ===
+URL: https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/content.7z
+Downloaded to: C:\Users\Intel\Desktop\svoLauncher\launcher\resources\content.7z
+Size: 1817405884 bytes (matches content-meta.json)
+SHA256: 6C929E4714EA491348E683D4ADF33E985DBD154DAA307364EAB1ADF9B8E3E4E7 (VERIFIED)
+
+pgcclient.jar recovery:
+  Archive list mods/*pgcclient* : 0 files (jar is at archive root: pgcclient.jar)
+  Extracted to: C:\Users\Intel\Desktop\svoLauncher\mod\build\libs\pgcclient.jar (2410417 bytes)
+  Copied to: C:\Users\Intel\Desktop\svoLauncher\svo-build\mods\pgcclient.jar
+  mod/README.txt documents lost Java sources
+
+=== STEP 5: Project structure ===
+C:\Users\Intel\Desktop\svoLauncher\version.json -> version 2.1.0 (BOM removed for sync-version.js)
+C:\Users\Intel\Desktop\svoLauncher\svo-build\ <- merged from launcher\resources\svo-build (79 files)
+C:\Users\Intel\Desktop\svoLauncher\scripts\ -> present (sync-version, copy-installer, etc.)
+
+=== STEP 6: Launcher folder ===
+C:\Users\Intel\Desktop\svoLauncher\launcher\package.json
+C:\Users\Intel\Desktop\svoLauncher\launcher\src\
+C:\Users\Intel\Desktop\svoLauncher\launcher\resources\ (+ content.7z)
+C:\Users\Intel\Desktop\svoLauncher\launcher\src-recovered\
+
+=== BUILD (npm install + dist:desktop) ===
+npm install: exit 0, added 436 packages, 16 vulnerabilities reported (audit not run)
+npm run dist:desktop: exit 0
+  electron-builder 24.13.3, electron 31.7.7
+  NSIS installer: Project Global Conflict Launcher Setup 2.1.0.exe (76886410 bytes ~73.3 MiB)
+  Desktop copy: C:\Users\Intel\Desktop\Project Global Conflict Launcher Setup 2.1.0.exe
+  Build output: C:\Users\Intel\Desktop\svoLauncher\launcher\release\Project Global Conflict Launcher Setup 2.1.0.exe
+  Note: lightweight installer; full modpack (~1733 MiB) downloads on first launch
+
+=== RECOVERED ===
+[OK] Electron launcher JavaScript source (v2.1.0)
+[OK] package.json + devDependencies (electron, electron-builder)
+[OK] modpack-manifest.json, content-meta.json
+[OK] svo-build client config/options at project root
+[OK] 7za binary for archives
+[OK] content.7z modpack archive (GitHub release)
+[OK] github-updates manifest repo clone
+[OK] pgcclient.jar from content.7z (sources still missing)
+[OK] Rebuilt Windows installer on Desktop
+
+=== STILL MISSING ===
+[MISSING] Original svoLauncher git history / remote (unless re-init manually)
+[MISSING] Mod Java/source tree for pgcclient and other custom mods
+[MISSING] Full svo-build pipeline that produced content.7z (only shipped config + recovered jar)
+
+=== STATUS ===
+SETUP COMPLETE — dev environment builds installer successfully.
