@@ -111,7 +111,6 @@ async function downloadModpackEntry(manifest, entry, gameDir, log, onProgress) {
   await fsp.mkdir(path.dirname(dest), { recursive: true });
   const tmp = `${dest}.download`;
 
-  log?.(`Загрузка: ${entry.path} (${((entry.size || 0) / (1024 * 1024)).toFixed(1)} МБ)…`);
   await downloadEntryFile(urls, tmp, onProgress);
 
   const hash = sha256File(tmp);
@@ -122,7 +121,6 @@ async function downloadModpackEntry(manifest, entry, gameDir, log, onProgress) {
 
   await fsp.rm(dest, { force: true });
   await fsp.rename(tmp, dest);
-  log?.(`Установлен: ${entry.path}`);
 }
 
 function readLocalState(gameDir) {
@@ -336,8 +334,6 @@ async function applyManifestRemovals(gameDir, log) {
     const target = path.join(gameDir, rel);
     if (!fs.existsSync(target)) continue;
     await fsp.rm(target, { force: true });
-    removed += 1;
-    log?.(`Удалён (обновление): ${rel}`);
   }
   return removed;
 }
@@ -356,13 +352,9 @@ async function applyUpdates(gameDir, log, status) {
   if (!manifest) {
     throw new Error('URL обновлений не настроен (content.manifestUrl).');
   }
-  if (source === 'bundled') {
-    log?.('Манифест с GitHub недоступен — используется встроенная копия.');
-  }
 
   const plan = planSync(gameDir, manifest, { verifyDisk: false });
   if (!plan.available) {
-    log?.('Сборка уже актуальна.');
     return { updated: false, fileCount: 0 };
   }
 
@@ -371,7 +363,6 @@ async function applyUpdates(gameDir, log, status) {
 
   if (toDownload.length === 0 && toRemove.length === 0) {
     await finalizeLocalState(gameDir, manifest);
-    log?.('Сборка уже актуальна.');
     return { updated: false, fileCount: 0 };
   }
 
@@ -383,16 +374,11 @@ async function applyUpdates(gameDir, log, status) {
     status?.(`Удаление устаревших файлов… (${step}/${total})`, step / total);
     const target = path.join(gameDir, rel);
     await fsp.rm(target, { force: true });
-    log?.(`Удалён: ${rel}`);
   }
 
   const concurrency = Math.max(1, Number(config.downloadConcurrency) || 6);
   let completedDownloads = 0;
   const progressByPath = new Map();
-
-  if (toDownload.length > 0) {
-    log?.(`Параллельная загрузка: ${concurrency} поток(ов).`);
-  }
 
   await runWithConcurrency(toDownload, concurrency, async (entry) => {
     progressByPath.set(entry.path, 0);
@@ -422,7 +408,6 @@ async function applyUpdates(gameDir, log, status) {
   });
 
   await finalizeLocalState(gameDir, manifest, { downloaded: toDownload, removed: toRemove });
-  log?.(`Обновление завершено (ревизия ${manifest.revision}).`);
   status?.('Сборка обновлена', 1);
   return { updated: true, fileCount: toDownload.length + toRemove.length };
 }
@@ -509,13 +494,7 @@ async function ensureCriticalModJars(gameDir, log) {
   const allOk = checks.every((entry) => modJarMatchesManifest(gameDir, entry));
   if (allOk) return { updated: fromDat.repaired > 0 };
 
-  for (const entry of checks) {
-    if (!modJarMatchesManifest(gameDir, entry)) {
-      log?.(`Обновление: ${path.basename(entry.path)}…`);
-    }
-  }
-
-  const result = await applyUpdates(gameDir, log, () => {});
+  const result = await applyUpdates(gameDir, null, () => {});
   return { updated: result.updated || fromDat.repaired > 0 };
 }
 
@@ -538,8 +517,7 @@ async function ensureClientModJar(gameDir, log) {
   const diskHash = fs.existsSync(dest) ? sha256File(dest) : null;
   if (diskHash === entry.sha256) return { updated: false };
 
-  log?.(`Клиентский мод устарел — обновление ${path.basename(dest)}…`);
-  const result = await applyUpdates(gameDir, log, () => {});
+  const result = await applyUpdates(gameDir, null, () => {});
   return { updated: result.updated };
 }
 

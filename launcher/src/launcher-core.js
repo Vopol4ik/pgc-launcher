@@ -352,33 +352,20 @@ class GameLauncher extends EventEmitter {
   async autoApplyModpackUpdates({ quiet = false } = {}) {
     const check = await checkForUpdates(this.gameDir);
     if (check.ok && !check.available) {
-      if (!quiet) this.log('Сборка уже актуальна.');
       this.status('Готов к запуску', 0, { updating: false });
       return { updated: false };
     }
 
-    if (!quiet) {
-      if (check.ok && check.revision > check.localRevision) {
-        this.log(`Обновление сборки (рев. ${check.localRevision} → ${check.revision})…`);
-      } else {
-        this.log('Проверка обновлений сборки…');
-      }
-    }
     if (check.ok && check.available) {
       this.status('Скачивание обновления…', 0, { updating: true });
-    } else if (!quiet) {
-      this.status('Проверка обновлений…', 0, { updating: false });
     }
     const result = await applyUpdates(
       this.gameDir,
-      (m) => this.log(m),
+      null,
       (t, p) => this.modpackStatusCallback(t, p)
     );
-    const removed = await applyManifestRemovals(this.gameDir, (m) => this.log(m));
-    if (removed > 0) {
-      this.log(`Удалено устаревших файлов: ${removed}.`);
-    }
-    if (result.updated) {
+    await applyManifestRemovals(this.gameDir, null);
+    if (result.updated && !quiet) {
       this.log(`Сборка обновлена: ${result.fileCount} файл(ов), рев. ${check.revision ?? '?'}.`);
     }
     await this.stripBlockedMods(path.join(this.gameDir, 'mods'));
@@ -397,16 +384,9 @@ class GameLauncher extends EventEmitter {
         return { ok: true, skipped: true };
       }
       await this.autoApplyModpackUpdates({ quiet });
-      const client = await ensureClientModJar(this.gameDir, (m) => {
-        if (!quiet) this.log(m);
-      });
-      const critical = await ensureCriticalModJars(this.gameDir, (m) => {
-        if (!quiet) this.log(m);
-      });
+      const client = await ensureClientModJar(this.gameDir, null);
+      const critical = await ensureCriticalModJars(this.gameDir, null);
       await this.stripBlockedMods(path.join(this.gameDir, 'mods'));
-      if ((client.updated || critical.updated) && !quiet) {
-        this.log('Недостающие файлы сборки восстановлены.');
-      }
       return { ok: true, updated: Boolean(client.updated || critical.updated) };
     } catch (e) {
       this.log(`Обновление: ${e.message}`);
@@ -432,10 +412,10 @@ class GameLauncher extends EventEmitter {
       await this.stripBlockedMods(path.join(this.gameDir, 'mods'));
     }
     await this.autoApplyModpackUpdates();
-    const critical = await ensureCriticalModJars(this.gameDir, (m) => this.log(m));
-    const client = await ensureClientModJar(this.gameDir, (m) => this.log(m));
+    const critical = await ensureCriticalModJars(this.gameDir, null);
+    const client = await ensureClientModJar(this.gameDir, null);
     if (critical.updated || client.updated) {
-      this.log('Критичные моды сборки обновлены (pgcclient / Superb Warfare).');
+      this.log('Критичные моды сборки обновлены.');
     }
     await this.syncBaseFiles();
     const settings = this.loadLauncherSettings();
@@ -456,7 +436,7 @@ class GameLauncher extends EventEmitter {
   async applyModpackUpdates() {
     const result = await applyUpdates(
       this.gameDir,
-      (m) => this.log(m),
+      null,
       (t, p) => this.status(t, p)
     );
     await this.stripBlockedMods(path.join(this.gameDir, 'mods'));
