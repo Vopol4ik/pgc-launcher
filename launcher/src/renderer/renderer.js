@@ -482,7 +482,6 @@ function openLog() {
   logToggle.classList.add('active');
   logToggle.setAttribute('aria-expanded', 'true');
   logPanel.classList.add('is-open');
-  contentRoot?.classList.add('is-log-open');
   scheduleLogPaint();
   setTimeout(() => {
     logAnimating = false;
@@ -495,7 +494,6 @@ function closeLog() {
   logPanel.classList.remove('is-open');
   logToggle.classList.remove('active');
   logToggle.setAttribute('aria-expanded', 'false');
-  contentRoot?.classList.remove('is-log-open');
 
   setTimeout(() => {
     logPanel.setAttribute('aria-hidden', 'true');
