@@ -23,30 +23,154 @@
   </div>
 
   <main class="content" id="content-root">
-    <div class="content-main">
-      <div class="hero">
-        <div class="logo-wrap">
-          <img class="logo-img" src="logo.png" alt="Project Global Conflict" />
-        </div>
-        <div class="hero-text">
-          <h1 class="hero-title" id="hero-title">Project Global Conflict</h1>
-          <div class="hero-sub">CLIENT LAUNCHER</div>
-          <div class="project-card">
-            <p class="project-desc" id="project-desc">Клиент Project Global Conflict</p>
+    <aside class="sidebar" aria-label="Навигация">
+      <div class="sidebar-brand">
+        <span class="sidebar-logo-text">PGC</span>
+      </div>
+
+      <div class="sidebar-fill"></div>
+
+      <div class="sidebar-bottom">
+        <nav class="sidebar-nav">
+          <button id="settings-btn" class="sidebar-nav-btn" type="button" title="Настройки">
+            <span class="sidebar-nav-label">Настройки</span>
+          </button>
+          <button id="log-toggle" class="sidebar-nav-btn" type="button" title="Журнал запуска" aria-expanded="false">
+            <span class="sidebar-nav-label">Лог</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-profile">
+          <button type="button" class="profile-avatar" id="profile-avatar" title="Сменить аватар" aria-label="Сменить аватар">?</button>
+          <input id="avatar-input" class="avatar-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" tabindex="-1" />
+          <div class="profile-fields">
+            <input id="nickname" class="profile-nick-input" type="text" maxlength="16" placeholder="Ник" autocomplete="username" aria-label="Игровой ник" />
+            <div class="field-hint profile-nick-hint" id="nick-hint"></div>
           </div>
         </div>
       </div>
+    </aside>
 
-      <div class="panel">
-        <label class="field-label" for="nickname">Игровой ник</label>
-        <input id="nickname" class="nickname" type="text" maxlength="16" placeholder="Введите ник" autocomplete="off" />
-        <div class="hint" id="nick-hint">3–16 символов: латиница, цифры и _</div>
+    <div class="main-shell">
+      <div class="layout-body">
+        <div class="hero hero-compact">
+          <div class="hero-text">
+            <h1 class="hero-title" id="hero-title">servers</h1>
+            <div class="hero-sub">active servers</div>
+          </div>
+        </div>
 
-        <button id="play-btn" class="play-btn"><span>ИГРАТЬ</span></button>
+        <div class="layout-row">
+          <div class="play-panels">
+            <div class="panel">
+              <div class="server-strip" id="server-strip" aria-live="polite">
+                <div class="server-strip-item">
+                  <span class="server-strip-dot" id="server-dot"></span>
+                  <div class="server-strip-meta">
+                    <span class="server-strip-label">Онлайн</span>
+                    <span class="server-strip-value" id="stat-online">—</span>
+                  </div>
+                </div>
+                <div class="server-strip-item">
+                  <div class="server-strip-meta">
+                    <span class="server-strip-label">TPS</span>
+                    <span class="server-strip-value" id="stat-tps">—</span>
+                  </div>
+                </div>
+                <div class="server-strip-item">
+                  <div class="server-strip-meta">
+                    <span class="server-strip-label">Пинг</span>
+                    <span class="server-strip-value" id="stat-ping">—</span>
+                  </div>
+                </div>
+              </div>
 
-        <div class="progress-wrap" id="progress-wrap">
-          <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-          <div class="status-text" id="status-text">Готов к запуску</div>
+              <div class="panel-body panel-body-play">
+                <div class="panel-launch">
+                  <div class="panel-actions">
+                    <button id="play-btn" class="play-btn" type="button"><span>Играть</span></button>
+                  </div>
+
+                  <div class="progress-wrap" id="progress-wrap">
+                    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+                    <div class="status-text" id="status-text">Готов к запуску</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel panel-unavailable" aria-disabled="true">
+              <div class="server-strip">
+                <div class="server-strip-item">
+                  <span class="server-strip-dot"></span>
+                  <div class="server-strip-meta">
+                    <span class="server-strip-label">Онлайн</span>
+                    <span class="server-strip-value">—</span>
+                  </div>
+                </div>
+                <div class="server-strip-item">
+                  <div class="server-strip-meta">
+                    <span class="server-strip-label">TPS</span>
+                    <span class="server-strip-value">—</span>
+                  </div>
+                </div>
+                <div class="server-strip-item">
+                  <div class="server-strip-meta">
+                    <span class="server-strip-label">Пинг</span>
+                    <span class="server-strip-value">—</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel-body panel-body-play">
+                <div class="panel-launch">
+                  <div class="panel-actions">
+                    <button class="play-btn" type="button" disabled tabindex="-1" aria-hidden="true"><span aria-hidden="true"></span></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <aside class="news-sidebar" aria-label="Новости">
+            <div class="news-stack">
+              <div class="news-card news-card-ghost news-card-ghost-2" aria-hidden="true"></div>
+              <div class="news-card news-card-ghost news-card-ghost-1" aria-hidden="true"></div>
+              <div class="news-card news-card-main">
+                <div class="news-head">
+                  <span class="news-head-title">Новости</span>
+                  <span class="news-badge" id="news-badge">…</span>
+                </div>
+                <div class="news-sync" id="news-sync" aria-live="polite"></div>
+                <div class="news-list" id="news-list"></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+
+      <div class="footer">
+        <span id="version-label" class="version-label">Minecraft 1.20.1 · Forge</span>
+      </div>
+
+      <div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
+        <div class="settings-panel" role="dialog" aria-labelledby="settings-title">
+          <div class="settings-head">
+            <h2 id="settings-title">Системные настройки</h2>
+            <button id="settings-close" class="tb-btn" type="button" title="Закрыть">&#10005;</button>
+          </div>
+          <div class="settings-body">
+            <label class="field-label" for="memory-min">ОЗУ минимум (МБ)</label>
+            <select id="memory-min" class="settings-select"></select>
+            <label class="field-label" for="memory-max">ОЗУ максимум (МБ)</label>
+            <select id="memory-max" class="settings-select"></select>
+            <label class="settings-check">
+              <input id="fullscreen" type="checkbox" />
+              <span>Полноэкранный режим</span>
+            </label>
+            <p class="settings-note">Игра: чувствительность 67%, прорисовка 28, симуляция 5. R не занят перезагрузкой шейдеров.</p>
+          </div>
+          <button id="settings-save" class="play-btn settings-save" type="button"><span>СОХРАНИТЬ</span></button>
         </div>
       </div>
     </div>
@@ -61,42 +185,6 @@
       </div>
       <pre id="log" class="log-body"></pre>
     </section>
-
-    <div class="footer">
-      <span id="version-label" class="version-label">Minecraft 1.20.1 · Forge</span>
-      <div class="footer-actions">
-        <button id="settings-btn" class="footer-btn" type="button" title="Настройки">
-          <span class="footer-btn-icon">&#9881;</span>
-          <span class="footer-btn-label">Настройки</span>
-        </button>
-        <button id="log-toggle" class="footer-btn" type="button" title="Журнал запуска" aria-expanded="false">
-          <span class="footer-btn-icon">&#9776;</span>
-          <span class="footer-btn-label">Лог</span>
-        </button>
-      </div>
-    </div>
-
-    <div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
-      <div class="settings-panel" role="dialog" aria-labelledby="settings-title">
-        <div class="settings-head">
-          <h2 id="settings-title">Системные настройки</h2>
-          <button id="settings-close" class="tb-btn" type="button" title="Закрыть">&#10005;</button>
-        </div>
-        <div class="settings-body">
-          <label class="field-label" for="memory-min">ОЗУ минимум (МБ)</label>
-          <select id="memory-min" class="settings-select"></select>
-          <label class="field-label" for="memory-max">ОЗУ максимум (МБ)</label>
-          <select id="memory-max" class="settings-select"></select>
-          <label class="settings-check">
-            <input id="fullscreen" type="checkbox" />
-            <span>Полноэкранный режим</span>
-          </label>
-          <p class="settings-note">Игра: чувствительность 67%, прорисовка 28, симуляция 5. R не занят перезагрузкой шейдеров.</p>
-        </div>
-        <button id="settings-save" class="play-btn settings-save" type="button"><span>СОХРАНИТЬ</span></button>
-      </div>
-    </div>
-
   </main>
   </div>
 

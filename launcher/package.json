@@ -1,6 +1,6 @@
 {
   "name": "svo-launcher",
-  "version": "2.1.0",
+  "version": "2.1.2",
   "description": "Project Global Conflict Minecraft Launcher (Forge 1.20.1, offline)",
   "author": "Project Global Conflict",
   "license": "MIT",
@@ -62,6 +62,10 @@
       {
         "from": "resources/modpack-manifest.json",
         "to": "modpack-manifest.json"
+      },
+      {
+        "from": "resources/news.json",
+        "to": "news.json"
       },
       {
         "from": "../svo-build/config",

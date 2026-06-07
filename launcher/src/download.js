@@ -2,6 +2,12 @@
 
 const fs = require('fs');
 const https = require('https');
+const config = require('./config');
+
+const downloadAgent = new https.Agent({
+  keepAlive: true,
+  maxSockets: Math.max(4, Number(config.maxDownloadSockets) || 8)
+});
 
 function download(url, dest, onProgress, redirects = 0) {
   return new Promise((resolve, reject) => {
@@ -9,6 +15,7 @@ function download(url, dest, onProgress, redirects = 0) {
       return reject(new Error('Слишком много перенаправлений при загрузке'));
     }
     const req = https.get(url, {
+      agent: downloadAgent,
       headers: {
         'User-Agent': 'PGC-Launcher/1.0',
         Accept: '*/*'
@@ -69,6 +76,7 @@ function fetchJson(url, redirects = 0) {
       return reject(new Error('Слишком много перенаправлений при запросе API'));
     }
     https.get(url, {
+      agent: downloadAgent,
       headers: {
         'User-Agent': 'PGC-Launcher/1.0',
         Accept: 'application/json'

@@ -4,6 +4,14 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('svo', {
   getInfo: () => ipcRenderer.invoke('app:info'),
+  getNews: () => ipcRenderer.invoke('news:fetch'),
+  getServerStatus: () => ipcRenderer.invoke('server:status'),
+  login: (username, password, rememberPassword = true) =>
+    ipcRenderer.invoke('auth:login', { username, password, rememberPassword }),
+  checkLogin: (username) => ipcRenderer.invoke('auth:check', { username }),
+  register: (username, password, confirmPassword, rememberPassword = true) =>
+    ipcRenderer.invoke('auth:register', { username, password, confirmPassword, rememberPassword }),
+  logout: () => ipcRenderer.invoke('auth:logout'),
   saveSettings: (data) => ipcRenderer.invoke('settings:save', data),
   launch: (username) => ipcRenderer.invoke('game:launch', username),
   checkUpdates: () => ipcRenderer.invoke('update:check'),

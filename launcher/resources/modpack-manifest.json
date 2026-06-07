@@ -1,6 +1,6 @@
 {
-  "revision": 17,
-  "builtAt": "2026-06-04T16:29:36.951Z",
+  "revision": 19,
+  "builtAt": "2026-06-07T18:00:00.000Z",
   "baseUrl": null,
   "files": [
     {
@@ -14,12 +14,6 @@
       "sha256": "3da53cdf856757d9ec7df0be86bc23b2c7d67a019b490f8f64317d4d9b77cac8",
       "size": 460234,
       "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__BadOptimizations-2.4.1-1.20.1.jar"
-    },
-    {
-      "path": "mods/BeyondHorizons IV-1.0.1.jar",
-      "sha256": "54754a8784e759382eb2f89a774efe8b52c42c6c2477c5e3c225af8bb9417390",
-      "size": 94725,
-      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__BeyondHorizons.IV-1.0.1.jar"
     },
     {
       "path": "mods/C.M.A_Transport_Pack _v.3.3-1.20.1.jar",
@@ -334,16 +328,10 @@
       "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__PeakStamina-Forge-1.9.19-1.20.1.jar"
     },
     {
-      "path": "mods/pgcclient-2.0.0.jar",
-      "sha256": "2031286a2cf2faa6612704671740e44e0c27a2cbe812a82aff6ee3765d252c90",
-      "size": 2410417,
-      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__pgcclient-2.0.0.jar"
-    },
-    {
       "path": "mods/pgcclient-2.1.0.jar",
       "sha256": "2031286a2cf2faa6612704671740e44e0c27a2cbe812a82aff6ee3765d252c90",
       "size": 2410417,
-      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__pgcclient-2.1.0.jar"
+      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__pgcclient-2.0.0.jar"
     },
     {
       "path": "mods/player-animation-lib-forge-1.0.2-rc1+1.20.jar",

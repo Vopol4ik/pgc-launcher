@@ -291,7 +291,10 @@ async function extractContentToGame(gameDir, log, status) {
   await fsp.mkdir(tmp, { recursive: true });
 
   status('Распаковка сборки…', 0);
-  extract7z(archive, tmp);
+  const extractOpts = await extract7z(archive, tmp);
+  log?.(
+    `Распаковка: лимит CPU ~${extractOpts.maxCpuPercent}% (${extractOpts.threads === 'on' ? 'все ядра' : `${extractOpts.threads} поток(ов)`} 7-Zip).`
+  );
 
   const modsDir = path.join(gameDir, 'mods');
   await fsp.rm(modsDir, { recursive: true, force: true });

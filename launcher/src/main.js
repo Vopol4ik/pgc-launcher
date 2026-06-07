@@ -13,11 +13,16 @@ const { formatLaunchError } = require('./errors');
 const { GameLauncher, getGameDir } = require('./launcher-core');
 const { applyLauncherCpuLimit } = require('./cpu-limit');
 const { applyDiscreteGpuToProcessEnv } = require('./gpu-env');
+const { fetchNews } = require('./news');
+const { fetchServerStatus } = require('./server-status');
+const { login, registerAccount, checkLoginExists, validateSession } = require('./launcher-auth');
+const { applyRememberPassword, sanitizeSettingsForRenderer } = require('./credentials-store');
+const { checkForUpdates } = require('./modpack-sync');
 
 let mainWindow = null;
 const launcher = new GameLauncher();
 
-const WINDOW_SIZE = { width: 970, height: 600, logExtra: 210 };
+const WINDOW_SIZE = { width: 1010, height: 635, logExtra: 235 };
 const LOG_ANIM_MS = 240;
 const LOG_FLUSH_MS = 48;
 const MAX_CPU_PERCENT = config.java?.maxCpuPercent ?? 75;
@@ -146,10 +151,50 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
-// --- IPC ---
+ipcMain.handle('news:fetch', async () => {
+  const news = await fetchNews();
+  let modpackRevision = null;
+  let updateAvailable = false;
+  try {
+    const check = await checkForUpdates(getGameDir());
+    if (check.ok) {
+      modpackRevision = check.revision;
+      updateAvailable = Boolean(check.available);
+    }
+  } catch {
+    // не критично для новостей
+  }
+  return {
+    ok: true,
+    ...news,
+    modpackRevision,
+    updateAvailable
+  };
+});
 
-ipcMain.handle('app:info', () => {
+ipcMain.handle('server:status', async () => {
+  try {
+    return { ok: true, ...(await fetchServerStatus()) };
+  } catch (err) {
+    return {
+      ok: false,
+      online: false,
+      playersOnline: null,
+      playersMax: null,
+      pingMs: null,
+      tps: null,
+      error: formatLaunchError(err)
+    };
+  }
+});
+
+ipcMain.handle('app:info', async () => {
   const saved = loadSettings();
+  let auth = { ok: false, login: null };
+  if (saved.authSession) {
+    auth = await validateSession(getGameDir(), saved.authSession);
+  }
+  const settings = sanitizeSettingsForRenderer({ ...config.launcherDefaults, ...saved });
   return {
     brand: config.brand,
     version: config.minecraft.version,
@@ -158,22 +203,103 @@ ipcMain.handle('app:info', () => {
     javaMajor: config.java?.major ?? 17,
     defaults: config.launcherDefaults,
     memoryOptions: [2048, 4096, 6144, 8192, 10240, 12288, 16384, 20480, 24576, 28672],
-    settings: { ...config.launcherDefaults, ...saved }
+    settings,
+    auth: auth.ok ? { ok: true, login: auth.login } : { ok: false, login: null }
   };
 });
 
 ipcMain.handle('settings:save', (_e, data) => {
   const current = loadSettings();
-  const merged = { ...current, ...data };
+  const merged = applyRememberPassword({ ...current, ...data }, data);
+  if ('password' in merged) delete merged.password;
+  if ('savedPassword' in merged) delete merged.savedPassword;
   saveSettings(merged);
-  return merged;
+  return sanitizeSettingsForRenderer(merged);
+});
+
+function persistAuthSession(login, session, password, rememberPassword) {
+  const current = loadSettings();
+  const merged = applyRememberPassword({
+    ...current,
+    username: login,
+    authSession: session,
+    rememberPassword: rememberPassword !== false
+  }, {
+    rememberPassword: rememberPassword !== false,
+    savedPassword: rememberPassword !== false ? password : ''
+  });
+  if ('savedPassword' in merged) delete merged.savedPassword;
+  saveSettings(merged);
+}
+
+ipcMain.handle('auth:check', async (_e, payload) => {
+  try {
+    const username = String(payload?.username || '').trim();
+    return await checkLoginExists(getGameDir(), username);
+  } catch (err) {
+    return { ok: false, exists: false, error: formatLaunchError(err) };
+  }
+});
+
+ipcMain.handle('auth:register', async (_e, payload) => {
+  try {
+    const username = String(payload?.username || '').trim();
+    const password = String(payload?.password || '');
+    const confirmPassword = String(payload?.confirmPassword || '');
+    const result = await registerAccount(getGameDir(), username, password, confirmPassword);
+    if (!result.ok) return result;
+
+    persistAuthSession(
+      result.login,
+      result.session,
+      password,
+      payload?.rememberPassword !== false
+    );
+    return { ok: true, login: result.login };
+  } catch (err) {
+    return { ok: false, error: formatLaunchError(err) };
+  }
+});
+
+ipcMain.handle('auth:login', async (_e, payload) => {
+  try {
+    const username = String(payload?.username || '').trim();
+    const password = String(payload?.password || '');
+    if (!username || !password) {
+      return { ok: false, error: 'Введите ник и пароль.' };
+    }
+    const result = await login(getGameDir(), username, password);
+    if (!result.ok) return result;
+
+    persistAuthSession(
+      result.login,
+      result.session,
+      password,
+      payload?.rememberPassword !== false
+    );
+    return { ok: true, login: result.login };
+  } catch (err) {
+    return { ok: false, error: formatLaunchError(err) };
+  }
+});
+
+ipcMain.handle('auth:logout', () => {
+  const current = loadSettings();
+  const next = { ...current };
+  delete next.authSession;
+  saveSettings(next);
+  return { ok: true };
 });
 
 ipcMain.handle('game:launch', async (_e, username) => {
   try {
+    const nick = String(username || '').trim();
+    if (!nick) {
+      return { ok: false, error: 'Введите ник.' };
+    }
     const current = loadSettings();
-    saveSettings({ ...current, username });
-    await launcher.launch(username);
+    saveSettings({ ...current, username: nick.toLowerCase() });
+    await launcher.launch(nick);
     return { ok: true };
   } catch (err) {
     return { ok: false, error: formatLaunchError(err) };

@@ -52,6 +52,8 @@ module.exports = {
     title: `Project Global Conflict Launcher v${appVersion}`,
     titlebar: 'PROJECT GLOBAL CONFLICT',
     server: 'operativniki.minerent.io',
+    /** Опционально: JSON с полем tps для блока статуса в лаунчере. */
+    statusUrl: null,
     description:
       'Клиент Project Global Conflict: Forge 1.20.1, фиксированный сервер проекта, модовое вооружение, голосовой чат и единые настройки.'
   },
@@ -60,6 +62,18 @@ module.exports = {
     major: 17,
     maxCpuPercent: 75
   },
+
+  /** Распаковка content.7z: лимит ядер процесса 7-Zip (affinity). */
+  extractCpuPercent: 85,
+
+  /** Потоки 7-Zip: 0 = все ядра (-mmt=on), иначе точное число. */
+  extractThreads: 0,
+
+  /** Параллельных загрузок файлов модпака. */
+  downloadConcurrency: 6,
+
+  /** Одновременных HTTP-соединений при загрузке. */
+  maxDownloadSockets: 8,
 
   // Версия игры
   minecraft: {
@@ -94,8 +108,8 @@ module.exports = {
     releaseTag: contentUrls.releaseTag || github.releaseTag
   },
 
-  /** Пока лаунчер открыт — проверка GitHub каждые 2 минуты. */
-  updatePollIntervalMs: 120000,
+  /** Пока лаунчер открыт — лёгкая проверка ревизии на GitHub (без полного хеширования модов). */
+  updatePollIntervalMs: 300000,
 
   /** JVM: меньше вылетов при долгой игре на тяжёлой сборке. */
   jvmArgs: [

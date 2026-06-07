@@ -9,6 +9,7 @@ launcher/src-recovered/
 launcher/resources/content.7z
 launcher/resources/modpack.dat
 launcher/resources/.modpack-manifest-state.json
+launcher/resources/launcher-auth.json
 
 # Кэши
 **/.gradle/

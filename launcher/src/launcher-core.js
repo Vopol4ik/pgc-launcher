@@ -183,7 +183,7 @@ class GameLauncher extends EventEmitter {
     this.stopBackgroundUpdateLoop();
     const ms = Number(config.updatePollIntervalMs) || 120000;
     this.backgroundUpdateTimer = setInterval(() => {
-      this.syncModpackOnStartup().catch(() => {});
+      this.syncModpackOnStartup({ quiet: true }).catch(() => {});
     }, ms);
   }
 
@@ -218,7 +218,32 @@ class GameLauncher extends EventEmitter {
   async extractEmbeddedModpack() {
     await extractContentToGame(this.gameDir, (m) => this.log(m), (t, p) => this.status(t, p));
     const modsDir = path.join(this.gameDir, 'mods');
+    await this.normalizeClientModJar(modsDir);
     await this.stripBlockedMods(modsDir);
+  }
+
+  /** content.7z кладёт pgcclient.jar — переименовываем в pgcclient-<версия>.jar до stripBlockedMods. */
+  async normalizeClientModJar(modsDir) {
+    const targetName = `${config.clientModId}-${config.appVersion}.jar`.toLowerCase();
+    const target = path.join(modsDir, targetName);
+    if (fs.existsSync(target)) return;
+
+    const manifest = resolveBundledManifest();
+    const rel = `mods/${config.clientModId}-${config.appVersion}.jar`;
+    const entry = manifest?.files?.find((f) => f.path.replace(/\\/g, '/') === rel);
+    if (!entry) return;
+
+    const hashFile = (file) =>
+      crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
+
+    for (const name of [`${config.clientModId}.jar`, `${config.clientModId}-2.0.0.jar`]) {
+      const src = path.join(modsDir, name);
+      if (!fs.existsSync(src)) continue;
+      if (hashFile(src) !== entry.sha256) continue;
+      await fsp.rename(src, target);
+      this.log(`Клиентский мод: ${name} → ${path.basename(target)}`);
+      return;
+    }
   }
 
   forgeProfileId() {
@@ -265,6 +290,8 @@ class GameLauncher extends EventEmitter {
         lower.startsWith('fancymenu_') ||
         lower.includes('hcompass') ||
         lower.includes('bfcrr') ||
+        lower.includes('beyondhorizons') ||
+        lower.includes('bh_iv') ||
         lower.includes('cameraoverhaul') ||
         lower.includes('wrecked') ||
         lower.includes('mcsp-1.20.1') ||
@@ -310,16 +337,24 @@ class GameLauncher extends EventEmitter {
     }
   }
 
-  async autoApplyModpackUpdates() {
+  async autoApplyModpackUpdates({ quiet = false } = {}) {
     const check = await checkForUpdates(this.gameDir);
-    if (check.ok && check.revision > check.localRevision) {
-      this.log(`Обновление сборки (рев. ${check.localRevision} → ${check.revision})…`);
-    } else {
-      this.log('Проверка обновлений сборки…');
+    if (check.ok && !check.available) {
+      if (!quiet) this.log('Сборка уже актуальна.');
+      this.status('Готов к запуску', 0, { updating: false });
+      return { updated: false };
+    }
+
+    if (!quiet) {
+      if (check.ok && check.revision > check.localRevision) {
+        this.log(`Обновление сборки (рев. ${check.localRevision} → ${check.revision})…`);
+      } else {
+        this.log('Проверка обновлений сборки…');
+      }
     }
     if (check.ok && check.available) {
       this.status('Скачивание обновления…', 0, { updating: true });
-    } else {
+    } else if (!quiet) {
       this.status('Проверка обновлений…', 0, { updating: false });
     }
     const result = await applyUpdates(
@@ -340,16 +375,16 @@ class GameLauncher extends EventEmitter {
   }
 
   /** Синхронизация при открытии лаунчера (до нажатия «Играть»). */
-  async syncModpackOnStartup() {
+  async syncModpackOnStartup({ quiet = false } = {}) {
     if (this.gameRunning || this.syncInProgress) return { ok: true, skipped: true };
     this.syncInProgress = true;
     try {
       await fsp.mkdir(this.gameDir, { recursive: true });
       if (await this.modsNeedInstall()) {
-        this.log('Первая установка — полное обновление при запуске игры.');
+        if (!quiet) this.log('Первая установка — полное обновление при запуске игры.');
         return { ok: true, skipped: true };
       }
-      await this.autoApplyModpackUpdates();
+      await this.autoApplyModpackUpdates({ quiet });
       return { ok: true };
     } catch (e) {
       this.log(`Обновление: ${e.message}`);
@@ -503,7 +538,7 @@ class GameLauncher extends EventEmitter {
       customArgs: [...(config.jvmArgs || [])],
       overrides: {
         detached: true,
-        maxSockets: 4
+        maxSockets: Math.max(4, Number(config.maxDownloadSockets) || 8)
       }
     };
 
