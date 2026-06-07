@@ -305,6 +305,8 @@ class GameLauncher extends EventEmitter {
         lower.includes('beyondhorizons') ||
         lower.includes('bh_iv') ||
         lower.includes('cameraoverhaul') ||
+        lower.includes('distanthorizons') ||
+        (lower.startsWith('ecf-') && lower.endsWith('.jar')) ||
         lower.includes('wrecked') ||
         lower.includes('mcsp-1.20.1') ||
         lower.includes('dragonrise_reforge') ||

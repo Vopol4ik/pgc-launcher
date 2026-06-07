@@ -1,6 +1,6 @@
 {
-  "revision": 19,
-  "builtAt": "2026-06-07T18:00:00.000Z",
+  "revision": 20,
+  "builtAt": "2026-06-07T20:00:00.000Z",
   "baseUrl": null,
   "files": [
     {
@@ -58,28 +58,10 @@
       "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__DeltaForce.Melee.Pack-0.2.0.jar"
     },
     {
-      "path": "mods/DistantHorizons-3.0.3-b-1.20.1-fabric-forge.jar",
-      "sha256": "591c07d649dde7669b1e8d9a53e89a8bc3aa0b9b7e4d768c2209017b02193356",
-      "size": 29467253,
-      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__DistantHorizons-3.0.3-b-1.20.1-fabric-forge.jar"
-    },
-    {
       "path": "mods/dynamic-fps-3.11.4+minecraft-1.20.0-forge.jar",
       "sha256": "b0ecdf3a0619208441062ceeebce79256223ac4e341844a09a6859170d671920",
       "size": 402345,
       "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__dynamic-fps-3.11.4+minecraft-1.20.0-forge.jar"
-    },
-    {
-      "path": "mods/ecf-1.0.0.jar",
-      "sha256": "fd9e1bb739fdf3eac7f6bbf7957b7d6111f8b054228b4dff274e31ca4c8092bf",
-      "size": 1120858,
-      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__ecf-1.0.0.jar"
-    },
-    {
-      "path": "mods/ecf-1.0.1.jar",
-      "sha256": "fd9e1bb739fdf3eac7f6bbf7957b7d6111f8b054228b4dff274e31ca4c8092bf",
-      "size": 1120858,
-      "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/mods__ecf-1.0.1.jar"
     },
     {
       "path": "mods/embeddium-0.3.31+mc1.20.1.jar",
@@ -558,10 +540,13 @@
   ],
   "remove": [
     "mods/CameraOverhaul-v2.1.1-forge+mc[1.20-1.20.5].jar",
+    "mods/DistantHorizons-3.0.3-b-1.20.1-fabric-forge.jar",
     "mods/MCSP-1.20.1-V1.0.8(1).jar",
     "mods/Wrecked-1.1.2.jar",
     "mods/bfcrr-1.0.jar",
     "mods/dragonrise_reforge-1.3.0.jar",
+    "mods/ecf-1.0.0.jar",
+    "mods/ecf-1.0.1.jar",
     "mods/pgcclient-2.0.0.jar",
     "mods/superbwarfare-1.20.1-0.8.8-final-6a6b54795.jar",
     "mods/vvp-beta-1.20.1-0.2.0.jar",

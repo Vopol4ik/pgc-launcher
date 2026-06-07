@@ -192,7 +192,6 @@ key_key.curios.open.desc:key.keyboard.g
 key_iris.keybind.reload:key.keyboard.unknown
 key_iris.keybind.toggleShaders:key.keyboard.unknown
 key_iris.keybind.shaderPackSelection:key.keyboard.unknown
-key_key.ecf.open_backpack:key.keyboard.k
 key_key.tacz.inspect.desc:key.keyboard.h
 key_key.tacz.reload.desc:key.keyboard.r
 key_key.tacz.shoot.desc:key.mouse.left
