@@ -4,6 +4,7 @@
   --sidebar-width: calc(152px * var(--ui-scale));
   --header-top-pad: calc(18px * var(--ui-scale));
   --header-mark-size: calc(30px * var(--ui-scale));
+  --pgc-logo-size: calc(38px * var(--ui-scale));
   --pgc-offset-y: calc(7px * var(--ui-scale));
   --bg: #07090d;
   --bg-top: #0a0d12;
