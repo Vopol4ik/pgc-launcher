@@ -50,7 +50,7 @@ function downloadUrlsForEntry(manifest, entry) {
   if (primary) urls.push(primary);
 
   const rel = entry.path.replace(/\\/g, '/');
-  const clientRel = `mods/${config.clientModId}-${config.appVersion}.jar`;
+  const clientRel = config.clientModRel;
   if (rel === clientRel && config.content?.useGithubReleases && isGithubConfigured(config.github)) {
     // На GitHub часто лежит только mods__pgcclient-2.0.0.jar (тот же sha256).
     urls.push(releaseDownloadUrl(config.github, `mods/${config.clientModId}-2.0.0.jar`));
@@ -469,7 +469,7 @@ async function ensureCriticalModJars(gameDir, log) {
   if (!manifest) manifest = resolveBundledManifest();
   if (!manifest) return { updated: fromDat.repaired > 0 };
 
-  const clientRel = `mods/${config.clientModId}-${config.appVersion}.jar`;
+  const clientRel = config.clientModRel;
   const clientEntry = (manifest.files || []).find((f) => f.path.replace(/\\/g, '/') === clientRel);
   const checks = [clientEntry, ...CRITICAL_MOD_PATTERNS.map((re) => findManifestMod(manifest, re))].filter(Boolean);
 
@@ -497,7 +497,7 @@ async function ensureClientModJar(gameDir, log) {
   if (!manifest) manifest = resolveBundledManifest();
   if (!manifest) return { updated: false };
 
-  const rel = `mods/${config.clientModId}-${config.appVersion}.jar`;
+  const rel = config.clientModRel;
   const entry = (manifest.files || []).find((f) => f.path.replace(/\\/g, '/') === rel);
   if (!entry) return { updated: false };
 

@@ -224,12 +224,12 @@ class GameLauncher extends EventEmitter {
 
   /** content.7z кладёт pgcclient.jar — переименовываем в pgcclient-<версия>.jar до stripBlockedMods. */
   async normalizeClientModJar(modsDir) {
-    const targetName = `${config.clientModId}-${config.appVersion}.jar`.toLowerCase();
+    const targetName = config.clientModJarName.toLowerCase();
     const target = path.join(modsDir, targetName);
     if (fs.existsSync(target)) return;
 
     const manifest = resolveBundledManifest();
-    const rel = `mods/${config.clientModId}-${config.appVersion}.jar`;
+    const rel = config.clientModRel;
     const entry = manifest?.files?.find((f) => f.path.replace(/\\/g, '/') === rel);
     if (!entry) return;
 
@@ -299,7 +299,7 @@ class GameLauncher extends EventEmitter {
         lower.includes('vvp-beta') ||
         lower.includes('ywzj_vehicle') ||
         lower.includes('superbwarfare-1.20.1-0.8.8') ||
-        (lower.startsWith('pgcclient') && lower.endsWith('.jar') && lower !== `${config.clientModId}-${config.appVersion}.jar`.toLowerCase())
+        (lower.startsWith('pgcclient') && lower.endsWith('.jar') && lower !== config.clientModJarName.toLowerCase())
         || (lower.startsWith('svoclient') && lower.endsWith('.jar'));
       if (remove) {
         await fsp.rm(path.join(modsDir, name), { force: true });

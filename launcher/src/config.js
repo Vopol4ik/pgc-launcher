@@ -4,20 +4,23 @@ const fs = require('fs');
 const path = require('path');
 
 // Версия релиза — единый источник: ../version.json (см. npm run sync-version).
-function readAppVersion() {
+function readVersionMeta() {
   try {
     const raw = fs.readFileSync(path.join(__dirname, '..', '..', 'version.json'), 'utf8');
-    return JSON.parse(raw).version;
+    return JSON.parse(raw);
   } catch {
     try {
-      return require('../package.json').version;
+      return { version: require('../package.json').version };
     } catch {
-      return '0.0.0';
+      return { version: '0.0.0' };
     }
   }
 }
 
-const appVersion = readAppVersion();
+const versionMeta = readVersionMeta();
+const appVersion = versionMeta.version || '0.0.0';
+/** Версия jar pgcclient в сборке (не обязана совпадать с версией лаунчера). */
+const clientModVersion = versionMeta.clientModVersion || '2.1.0';
 const { resolveContentUrls } = require('./github-updates');
 
 const github = {
@@ -40,9 +43,12 @@ const contentUrls = resolveContentUrls(github, contentLegacy);
 // Центральная конфигурация лаунчера Project Global Conflict.
 module.exports = {
   appVersion,
+  clientModVersion,
 
   /** id мода Forge и имя jar: pgcclient-<версия>.jar */
   clientModId: 'pgcclient',
+  clientModJarName: `${versionMeta.clientModId || 'pgcclient'}-${clientModVersion}.jar`,
+  clientModRel: `mods/${versionMeta.clientModId || 'pgcclient'}-${clientModVersion}.jar`,
 
   github,
 

@@ -1,5 +1,6 @@
 {
   "version": "2.1.2",
+  "clientModVersion": "2.1.0",
   "productName": "Project Global Conflict Launcher",
   "installerName": "PGC Setup",
   "clientModId": "pgcclient"
