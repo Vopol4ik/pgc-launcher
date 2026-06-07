@@ -25,7 +25,11 @@ const {
   applyUpdates,
   applyManifestRemovals,
   refreshStateFromDisk,
+  resolveManifest,
   resolveBundledManifest,
+  resolveClientModEntry,
+  allowedClientModNames,
+  ensureClientModJar,
   ensureCriticalModJars
 } = require('./modpack-sync');
 
@@ -224,24 +228,24 @@ class GameLauncher extends EventEmitter {
 
   /** content.7z кладёт pgcclient.jar — переименовываем в pgcclient-<версия>.jar до stripBlockedMods. */
   async normalizeClientModJar(modsDir) {
-    const targetName = config.clientModJarName.toLowerCase();
+    const manifest = resolveBundledManifest();
+    const entry = resolveClientModEntry(manifest);
+    if (!entry) return;
+
+    const targetName = path.basename(entry.path);
     const target = path.join(modsDir, targetName);
     if (fs.existsSync(target)) return;
-
-    const manifest = resolveBundledManifest();
-    const rel = config.clientModRel;
-    const entry = manifest?.files?.find((f) => f.path.replace(/\\/g, '/') === rel);
-    if (!entry) return;
 
     const hashFile = (file) =>
       crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 
-    for (const name of [`${config.clientModId}.jar`, `${config.clientModId}-2.0.0.jar`]) {
+    for (const name of [`${config.clientModId}.jar`, `${config.clientModId}-2.0.0.jar`, config.clientModJarName]) {
       const src = path.join(modsDir, name);
       if (!fs.existsSync(src)) continue;
+      if (path.basename(src).toLowerCase() === targetName.toLowerCase()) continue;
       if (hashFile(src) !== entry.sha256) continue;
       await fsp.rename(src, target);
-      this.log(`Клиентский мод: ${name} → ${path.basename(target)}`);
+      this.log(`Клиентский мод: ${name} → ${targetName}`);
       return;
     }
   }
@@ -282,6 +286,14 @@ class GameLauncher extends EventEmitter {
   }
 
   async stripBlockedMods(modsDir) {
+    let manifest = resolveBundledManifest();
+    try {
+      const resolved = await resolveManifest();
+      manifest = resolved.manifest || manifest;
+    } catch {
+      // bundled manifest is enough
+    }
+    const keepClientMods = allowedClientModNames(manifest);
     const entries = await fsp.readdir(modsDir);
     for (const name of entries) {
       const lower = name.toLowerCase();
@@ -299,7 +311,7 @@ class GameLauncher extends EventEmitter {
         lower.includes('vvp-beta') ||
         lower.includes('ywzj_vehicle') ||
         lower.includes('superbwarfare-1.20.1-0.8.8') ||
-        (lower.startsWith('pgcclient') && lower.endsWith('.jar') && lower !== config.clientModJarName.toLowerCase())
+        (lower.startsWith('pgcclient') && lower.endsWith('.jar') && !keepClientMods.has(lower))
         || (lower.startsWith('svoclient') && lower.endsWith('.jar'));
       if (remove) {
         await fsp.rm(path.join(modsDir, name), { force: true });
@@ -385,7 +397,17 @@ class GameLauncher extends EventEmitter {
         return { ok: true, skipped: true };
       }
       await this.autoApplyModpackUpdates({ quiet });
-      return { ok: true };
+      const client = await ensureClientModJar(this.gameDir, (m) => {
+        if (!quiet) this.log(m);
+      });
+      const critical = await ensureCriticalModJars(this.gameDir, (m) => {
+        if (!quiet) this.log(m);
+      });
+      await this.stripBlockedMods(path.join(this.gameDir, 'mods'));
+      if ((client.updated || critical.updated) && !quiet) {
+        this.log('Недостающие файлы сборки восстановлены.');
+      }
+      return { ok: true, updated: Boolean(client.updated || critical.updated) };
     } catch (e) {
       this.log(`Обновление: ${e.message}`);
       this.status('Готов к запуску', 0, { updating: false });
@@ -411,7 +433,8 @@ class GameLauncher extends EventEmitter {
     }
     await this.autoApplyModpackUpdates();
     const critical = await ensureCriticalModJars(this.gameDir, (m) => this.log(m));
-    if (critical.updated) {
+    const client = await ensureClientModJar(this.gameDir, (m) => this.log(m));
+    if (critical.updated || client.updated) {
       this.log('Критичные моды сборки обновлены (pgcclient / Superb Warfare).');
     }
     await this.syncBaseFiles();

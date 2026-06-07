@@ -68,6 +68,10 @@
         "to": "news.json"
       },
       {
+        "from": "../version.json",
+        "to": "version.json"
+      },
+      {
         "from": "../svo-build/config",
         "to": "svo-build/config",
         "filter": [

@@ -3,24 +3,33 @@
 const fs = require('fs');
 const path = require('path');
 
-// Версия релиза — единый источник: ../version.json (см. npm run sync-version).
+// Версия релиза — единый источник: version.json (в resources при сборке или в корне репо).
 function readVersionMeta() {
-  try {
-    const raw = fs.readFileSync(path.join(__dirname, '..', '..', 'version.json'), 'utf8');
-    return JSON.parse(raw);
-  } catch {
+  const candidates = [
+    path.join(process.resourcesPath || '', 'version.json'),
+    path.join(__dirname, '..', '..', 'version.json')
+  ];
+  for (const file of candidates) {
     try {
-      return { version: require('../package.json').version };
+      return JSON.parse(fs.readFileSync(file, 'utf8'));
     } catch {
-      return { version: '0.0.0' };
+      // try next
     }
+  }
+  try {
+    return { version: require('../package.json').version };
+  } catch {
+    return { version: '0.0.0' };
   }
 }
 
 const versionMeta = readVersionMeta();
 const appVersion = versionMeta.version || '0.0.0';
+const clientModId = versionMeta.clientModId || 'pgcclient';
 /** Версия jar pgcclient в сборке (не обязана совпадать с версией лаунчера). */
 const clientModVersion = versionMeta.clientModVersion || '2.1.0';
+const clientModJarName = `${clientModId}-${clientModVersion}.jar`;
+const clientModRel = `mods/${clientModJarName}`;
 const { resolveContentUrls } = require('./github-updates');
 
 const github = {
@@ -45,10 +54,9 @@ module.exports = {
   appVersion,
   clientModVersion,
 
-  /** id мода Forge и имя jar: pgcclient-<версия>.jar */
-  clientModId: 'pgcclient',
-  clientModJarName: `${versionMeta.clientModId || 'pgcclient'}-${clientModVersion}.jar`,
-  clientModRel: `mods/${versionMeta.clientModId || 'pgcclient'}-${clientModVersion}.jar`,
+  clientModId,
+  clientModJarName,
+  clientModRel,
 
   github,
 

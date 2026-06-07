@@ -6,7 +6,7 @@ const path = require('path');
 const root = path.join(__dirname, '..');
 const versionFile = path.join(root, 'version.json');
 const meta = JSON.parse(fs.readFileSync(versionFile, 'utf8'));
-const { version, productName, installerName, clientModId } = meta;
+const { version, productName, installerName, clientModId, clientModVersion } = meta;
 const setupName = installerName || productName;
 
 if (!/^\d+\.\d+\.\d+$/.test(version)) {
@@ -43,4 +43,4 @@ if (fs.existsSync(gradleProps)) {
   fs.writeFileSync(gradleProps, gradle, 'utf8');
 }
 
-console.log(`Версия ${version} → package.json, gradle.properties, artifactName`);
+console.log(`Версия ${version} (client mod ${clientModVersion || version}) → package.json, gradle.properties, artifactName`);

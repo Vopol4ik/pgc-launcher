@@ -30,7 +30,23 @@ function resolveBundledManifest() {
 async function fetchRemoteManifest() {
   const url = config.content?.manifestUrl;
   if (!url) return null;
-  return fetchJson(url);
+  const bust = `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+  return fetchJson(bust);
+}
+
+function resolveClientModEntry(manifest) {
+  if (!manifest?.files?.length) return null;
+  const preferred = config.clientModRel.replace(/\\/g, '/');
+  const exact = manifest.files.find((f) => f.path.replace(/\\/g, '/') === preferred);
+  if (exact) return exact;
+  return manifest.files.find((f) => /^mods\/pgcclient-.+\.jar$/i.test(f.path.replace(/\\/g, '/'))) || null;
+}
+
+function allowedClientModNames(manifest) {
+  const names = new Set([config.clientModJarName.toLowerCase()]);
+  const entry = resolveClientModEntry(manifest);
+  if (entry) names.add(path.basename(entry.path).toLowerCase());
+  return names;
 }
 
 function fileUrl(manifest, entry) {
@@ -50,7 +66,8 @@ function downloadUrlsForEntry(manifest, entry) {
   if (primary) urls.push(primary);
 
   const rel = entry.path.replace(/\\/g, '/');
-  const clientRel = config.clientModRel;
+  const clientEntry = resolveClientModEntry(manifest);
+  const clientRel = clientEntry?.path.replace(/\\/g, '/') || config.clientModRel;
   if (rel === clientRel && config.content?.useGithubReleases && isGithubConfigured(config.github)) {
     // На GitHub часто лежит только mods__pgcclient-2.0.0.jar (тот же sha256).
     urls.push(releaseDownloadUrl(config.github, `mods/${config.clientModId}-2.0.0.jar`));
@@ -169,8 +186,18 @@ function isQuickUpToDate(gameDir, manifest) {
   const localState = readLocalState(gameDir);
   if ((manifest.revision ?? 0) > (localState.revision ?? 0)) return false;
   if (!localState.files || Object.keys(localState.files).length === 0) return false;
+
   const removePending = (manifest.remove || []).some((rel) => fs.existsSync(path.join(gameDir, rel)));
-  return !removePending;
+  if (removePending) return false;
+
+  for (const entry of manifest.files || []) {
+    if (!fs.existsSync(path.join(gameDir, entry.path))) return false;
+  }
+
+  const clientEntry = resolveClientModEntry(manifest);
+  if (clientEntry && localFileHash(gameDir, clientEntry.path) !== clientEntry.sha256) return false;
+
+  return true;
 }
 
 function filterEntriesNeedingDownload(gameDir, entries) {
@@ -209,6 +236,12 @@ function planSync(gameDir, manifest, { verifyDisk = false } = {}) {
   for (const entry of manifest.files || []) {
     const rel = entry.path.replace(/\\/g, '/');
     if (removeSet.has(rel)) continue;
+    const local = path.join(gameDir, entry.path);
+    if (!fs.existsSync(local)) {
+      toDownload.push(entry);
+      totalBytes += entry.size || 0;
+      continue;
+    }
     let hash = stateFiles[entry.path] ?? null;
     if (hash === null || verifyDisk) {
       hash = localFileHash(gameDir, entry.path);
@@ -470,7 +503,7 @@ async function ensureCriticalModJars(gameDir, log) {
   if (!manifest) return { updated: fromDat.repaired > 0 };
 
   const clientRel = config.clientModRel;
-  const clientEntry = (manifest.files || []).find((f) => f.path.replace(/\\/g, '/') === clientRel);
+  const clientEntry = resolveClientModEntry(manifest);
   const checks = [clientEntry, ...CRITICAL_MOD_PATTERNS.map((re) => findManifestMod(manifest, re))].filter(Boolean);
 
   const allOk = checks.every((entry) => modJarMatchesManifest(gameDir, entry));
@@ -497,10 +530,10 @@ async function ensureClientModJar(gameDir, log) {
   if (!manifest) manifest = resolveBundledManifest();
   if (!manifest) return { updated: false };
 
-  const rel = config.clientModRel;
-  const entry = (manifest.files || []).find((f) => f.path.replace(/\\/g, '/') === rel);
+  const entry = resolveClientModEntry(manifest);
   if (!entry) return { updated: false };
 
+  const rel = entry.path.replace(/\\/g, '/');
   const dest = path.join(gameDir, rel);
   const diskHash = fs.existsSync(dest) ? sha256File(dest) : null;
   if (diskHash === entry.sha256) return { updated: false };
@@ -517,6 +550,8 @@ module.exports = {
   resolveManifest,
   refreshStateFromDisk,
   resolveBundledManifest,
+  resolveClientModEntry,
+  allowedClientModNames,
   planSync,
   readLocalState,
   ensureClientModJar,
