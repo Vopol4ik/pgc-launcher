@@ -108,10 +108,18 @@ module.exports = {
     autoOnQuit: true
   },
 
-  /** Локальная веб-панель (только 127.0.0.1 на этом ПК). */
+  /**
+   * Админ-панель: npm run panel (отдельно от лаунчера игроков).
+   * remoteUrl — адрес панели для лаунчеров игроков (http://IP:17890).
+   */
   panel: {
     host: '127.0.0.1',
-    port: 17890
+    bindHost: '127.0.0.1',
+    port: 17890,
+    clientSecret: 'PGC-Panel-Client-2026',
+    remoteUrl: null,
+    remoteHost: '127.0.0.1',
+    pollIntervalMs: 5000
   },
 
   launcherDefaults: {

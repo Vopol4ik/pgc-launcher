@@ -22,8 +22,6 @@ const memoryMin = $('memory-min');
 const memoryMax = $('memory-max');
 const uiFontSelect = $('ui-font');
 const fullscreenCb = $('fullscreen');
-const panelBtn = $('panel-btn');
-
 const UI_FONTS = [
   { id: 'default', label: 'Segoe UI (по умолчанию)', stack: '"Segoe UI", system-ui, sans-serif' },
   { id: 'system', label: 'Системный', stack: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
@@ -550,14 +548,6 @@ function toggleLog() {
   if (isLogOpen()) closeLog();
   else openLog();
 }
-
-panelBtn?.addEventListener('click', async () => {
-  const result = await window.svo.openPanel();
-  if (!result.ok) {
-    setStatus(result.error || 'Не удалось открыть панель', 0);
-    setLogOpen(true);
-  }
-});
 
 logToggle.addEventListener('click', toggleLog);
 logClose.addEventListener('click', () => setLogOpen(false));

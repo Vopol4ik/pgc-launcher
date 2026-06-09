@@ -3,11 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PGC Panel</title>
+  <title>PGC Admin Panel</title>
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <div class="shell">
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+      <div class="brand-mark auth-mark">PGC</div>
+      <h1 class="auth-title">Админ-панель</h1>
+      <p class="auth-desc" id="auth-desc">Только для администратора проекта</p>
+      <form id="auth-form" class="auth-form">
+        <input id="auth-password" class="input" type="password" placeholder="Пароль администратора" autocomplete="current-password" required />
+        <button class="btn" type="submit" id="auth-submit">Войти</button>
+      </form>
+      <p class="auth-error" id="auth-error" hidden></p>
+    </div>
+  </div>
+
+  <div class="shell" id="app-shell" hidden>
     <div class="bg-glow" aria-hidden="true"></div>
 
     <header class="topbar">
@@ -15,18 +28,20 @@
         <div class="brand-mark">PGC</div>
         <div>
           <div class="brand-title">PROJECT GLOBAL CONFLICT</div>
-          <div class="brand-sub">Логи · игроки · баны · только этот ПК</div>
+          <div class="brand-sub">Управление игроками · баны · сессии</div>
         </div>
       </div>
       <div class="topbar-meta">
         <span class="pill" id="panel-status">Загрузка…</span>
         <span class="muted" id="panel-clock"></span>
+        <button class="btn-ghost" type="button" id="logout-btn">Выйти</button>
       </div>
     </header>
 
     <div class="layout">
       <nav class="nav" aria-label="Разделы">
         <button class="nav-btn is-active" data-view="dashboard" type="button">Обзор</button>
+        <button class="nav-btn" data-view="clients" type="button">Онлайн</button>
         <button class="nav-btn" data-view="players" type="button">Игроки</button>
         <button class="nav-btn" data-view="bans" type="button">Баны</button>
         <button class="nav-btn" data-view="logs" type="button">Логи</button>
@@ -43,15 +58,36 @@
               <div id="dash-server" class="card-body muted">—</div>
             </article>
             <article class="card">
-              <h2 class="card-title">Текущая сессия лаунчера</h2>
-              <div id="dash-live" class="card-body log-box">—</div>
+              <h2 class="card-title">Онлайн лаунчеров</h2>
+              <div id="dash-clients" class="card-body log-box">—</div>
             </article>
+          </div>
+        </section>
+
+        <section class="view" id="view-clients">
+          <h1 class="view-title">Онлайн лаунчеры</h1>
+          <p class="view-desc">Управление сессиями игроков в реальном времени (heartbeat каждые ~5 с).</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Ник</th>
+                  <th>HWID</th>
+                  <th>Версия</th>
+                  <th>Игра</th>
+                  <th>IP</th>
+                  <th>Последний сигнал</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="clients-body"></tbody>
+            </table>
           </div>
         </section>
 
         <section class="view" id="view-players">
           <h1 class="view-title">Игроки</h1>
-          <p class="view-desc">Локальная история запусков с этого компьютера.</p>
+          <p class="view-desc">История запусков с подключённых клиентов.</p>
           <div class="table-wrap">
             <table class="data-table">
               <thead>
@@ -64,9 +100,10 @@
 
         <section class="view" id="view-bans">
           <h1 class="view-title">Баны</h1>
-          <p class="view-desc">Локальный список. Файл: <code id="bans-path">…</code></p>
+          <p class="view-desc">Бан по нику и/или HWID. При бане HWID лаунчер закроется автоматически.</p>
           <form class="ban-form" id="ban-form">
-            <input id="ban-player" class="input" placeholder="Ник" maxlength="16" required />
+            <input id="ban-player" class="input" placeholder="Ник (необязательно)" maxlength="16" />
+            <input id="ban-hwid" class="input" placeholder="HWID (32 символа)" maxlength="64" />
             <input id="ban-reason" class="input" placeholder="Причина" maxlength="200" required />
             <input id="ban-by" class="input" placeholder="Кто выдал" maxlength="64" />
             <label class="check"><input id="ban-permanent" type="checkbox" checked /><span>Перманент</span></label>
@@ -75,7 +112,7 @@
           <div class="table-wrap">
             <table class="data-table">
               <thead>
-                <tr><th>Ник</th><th>Причина</th><th>Кем</th><th>До</th><th>Статус</th><th></th></tr>
+                <tr><th>Ник</th><th>HWID</th><th>Причина</th><th>Кем</th><th>До</th><th>Статус</th><th></th></tr>
               </thead>
               <tbody id="bans-body"></tbody>
             </table>
@@ -95,7 +132,7 @@
 
         <section class="view" id="view-sessions">
           <h1 class="view-title">Сессии</h1>
-          <p class="view-desc">История запусков лаунчера на этом ПК.</p>
+          <p class="view-desc">История запусков лаунчера.</p>
           <div class="table-wrap">
             <table class="data-table">
               <thead>

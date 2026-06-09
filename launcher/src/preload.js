@@ -8,7 +8,6 @@ contextBridge.exposeInMainWorld('svo', {
   getServerStatus: () => ipcRenderer.invoke('server:status'),
   saveSettings: (data) => ipcRenderer.invoke('settings:save', data),
   launch: (username) => ipcRenderer.invoke('game:launch', username),
-  openPanel: () => ipcRenderer.invoke('panel:open'),
   minimize: () => ipcRenderer.send('window:minimize'),
   close: () => ipcRenderer.send('window:close'),
 

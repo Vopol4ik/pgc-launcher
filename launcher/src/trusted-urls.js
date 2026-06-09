@@ -18,6 +18,11 @@ function isGithubAssetRedirect(urlString) {
   }
 }
 
+function pathMatchesRepo(pathname, gh) {
+  const prefix = `/${gh.owner}/${gh.repo}/`;
+  return String(pathname || '').toLowerCase().startsWith(prefix);
+}
+
 function isTrustedUrl(urlString, { allowMcsrvstat = false, allowGithubAssets = false } = {}) {
   let url;
   try {
@@ -37,14 +42,13 @@ function isTrustedUrl(urlString, { allowMcsrvstat = false, allowGithubAssets = f
 
   const path = url.pathname;
   if (host === 'github.com') {
-    const prefix = `/${gh.owner}/${gh.repo}/`;
-    return path.startsWith(prefix);
+    return pathMatchesRepo(path, gh);
   }
   if (host === 'raw.githubusercontent.com') {
-    return path.startsWith(`/${gh.owner}/${gh.repo}/`);
+    return pathMatchesRepo(path, gh);
   }
   if (host === 'api.github.com') {
-    return path.startsWith(`/repos/${gh.owner}/${gh.repo}/`);
+    return path.toLowerCase().startsWith(`/repos/${gh.owner}/${gh.repo}/`);
   }
   return false;
 }

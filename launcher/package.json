@@ -1,13 +1,14 @@
 {
   "name": "svo-launcher",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "Project Global Conflict Minecraft Launcher (Forge 1.20.1, offline)",
   "author": "Project Global Conflict",
   "license": "MIT",
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "start:panel": "electron src/panel-app-main.js",
+    "panel": "node scripts/start-admin-panel.js",
+    "start:panel": "node scripts/start-admin-panel.js",
     "dist:panel": "npm run sync-version && electron-builder --win --x64 --config electron-builder.panel.json",
     "dist:all": "npm run dist && npm run dist:panel",
     "assets": "node scripts/gen-assets.js",

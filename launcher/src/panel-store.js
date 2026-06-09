@@ -11,7 +11,10 @@ const SESSIONS_FILE = 'sessions.json';
 const BANS_FILE = 'bans.json';
 const ACTIVITY_FILE = 'activity.json';
 const JOURNAL_FILE = 'launcher-journal.json';
+const CLIENTS_FILE = 'clients.json';
+const COMMANDS_FILE = 'commands.json';
 const MAX_JOURNAL_LINES = 600;
+const CLIENT_ONLINE_MS = 45000;
 
 const GAME_ACTIVITY_RE = /\[CHAT\]|joined the game|left the game|was banned|was kicked|Connecting to|Connection reset|Internal Exception|Logged in with entity/i;
 
@@ -58,14 +61,18 @@ async function ensurePanelData() {
     }
   }
 
-  for (const file of [SESSIONS_FILE, ACTIVITY_FILE, JOURNAL_FILE]) {
+  for (const file of [SESSIONS_FILE, ACTIVITY_FILE, JOURNAL_FILE, CLIENTS_FILE, COMMANDS_FILE]) {
     const full = path.join(dir, file);
     if (!fs.existsSync(full)) {
       const empty = file === SESSIONS_FILE
         ? { sessions: [] }
         : file === JOURNAL_FILE
           ? { lines: [] }
-          : { entries: [] };
+          : file === CLIENTS_FILE
+            ? { clients: [] }
+            : file === COMMANDS_FILE
+              ? { pending: [] }
+              : { entries: [] };
       await writeJson(full, empty);
     }
   }
@@ -129,7 +136,8 @@ async function readBans() {
   const data = await readJson(path.join(getPanelDir(), BANS_FILE), { bans: [] });
   const bans = Array.isArray(data.bans) ? data.bans : [];
   return bans.map((b) => ({
-    player: String(b.player || '').toLowerCase(),
+    player: String(b.player || '').toLowerCase() || null,
+    hwid: String(b.hwid || '').toLowerCase() || null,
     reason: String(b.reason || '—'),
     by: String(b.by || 'Система'),
     until: b.until || null,
@@ -137,6 +145,102 @@ async function readBans() {
     active: b.active !== false,
     createdAt: b.createdAt || null
   }));
+}
+
+function isBanActive(ban) {
+  if (!ban?.active) return false;
+  if (ban.permanent || !ban.until) return true;
+  return new Date(ban.until).getTime() > Date.now();
+}
+
+async function findActiveBan({ player, hwid }) {
+  const bans = await readBans();
+  const nick = player ? String(player).toLowerCase() : '';
+  const id = hwid ? String(hwid).toLowerCase() : '';
+  return bans.find((b) => {
+    if (!isBanActive(b)) return false;
+    if (id && b.hwid && b.hwid === id) return true;
+    if (nick && b.player && b.player === nick) return true;
+    return false;
+  }) || null;
+}
+
+async function readClients() {
+  await ensurePanelData();
+  const data = await readJson(path.join(getPanelDir(), CLIENTS_FILE), { clients: [] });
+  return Array.isArray(data.clients) ? data.clients : [];
+}
+
+async function saveClients(clients) {
+  await writeJson(path.join(getPanelDir(), CLIENTS_FILE), {
+    clients,
+    updatedAt: new Date().toISOString()
+  });
+}
+
+async function upsertClientHeartbeat(payload) {
+  const hwid = String(payload.hwid || '').toLowerCase();
+  if (!hwid) throw new Error('HWID обязателен');
+  const clients = await readClients();
+  const now = new Date().toISOString();
+  const existing = clients.find((c) => c.hwid === hwid);
+  const entry = {
+    hwid,
+    username: String(payload.username || existing?.username || '').toLowerCase() || null,
+    launcherVersion: payload.launcherVersion || existing?.launcherVersion || null,
+    pid: payload.pid || existing?.pid || null,
+    gameRunning: Boolean(payload.gameRunning),
+    lastSeen: now,
+    firstSeen: existing?.firstSeen || now,
+    ip: payload.ip || existing?.ip || null
+  };
+  if (existing) Object.assign(existing, entry);
+  else clients.unshift(entry);
+  while (clients.length > 500) clients.pop();
+  await saveClients(clients);
+  return entry;
+}
+
+function listOnlineClients(clients, now = Date.now()) {
+  return clients
+    .filter((c) => now - new Date(c.lastSeen).getTime() <= CLIENT_ONLINE_MS)
+    .sort((a, b) => String(b.lastSeen).localeCompare(String(a.lastSeen)));
+}
+
+async function readCommands() {
+  await ensurePanelData();
+  const data = await readJson(path.join(getPanelDir(), COMMANDS_FILE), { pending: [] });
+  return Array.isArray(data.pending) ? data.pending : [];
+}
+
+async function saveCommands(pending) {
+  await writeJson(path.join(getPanelDir(), COMMANDS_FILE), {
+    pending,
+    updatedAt: new Date().toISOString()
+  });
+}
+
+async function enqueueCommand({ hwid, type, payload = {} }) {
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const pending = await readCommands();
+  pending.push({
+    id,
+    hwid: String(hwid || '').toLowerCase(),
+    type: String(type || 'message'),
+    payload,
+    createdAt: new Date().toISOString()
+  });
+  await saveCommands(pending);
+  return id;
+}
+
+async function pullCommandsForHwid(hwid) {
+  const id = String(hwid || '').toLowerCase();
+  const pending = await readCommands();
+  const mine = pending.filter((c) => c.hwid === id);
+  const rest = pending.filter((c) => c.hwid !== id);
+  if (mine.length) await saveCommands(rest);
+  return mine;
 }
 
 async function saveBans(bans) {
@@ -221,6 +325,8 @@ async function buildPanelSnapshot(live = {}) {
   const activity = await readStoredActivity(40);
   const logs = readGameLogs();
   const gameActivity = parseGameActivity(logs.latest);
+  const clients = await readClients();
+  const onlineClients = listOnlineClients(clients);
 
   return {
     brand: config.brand,
@@ -242,9 +348,13 @@ async function buildPanelSnapshot(live = {}) {
     sessions,
     players: collectPlayers(sessions, settings.username, live.sessionEvents),
     bans: {
-      active: bans.filter((b) => b.active),
+      active: bans.filter((b) => isBanActive(b)),
       all: bans,
-      count: bans.filter((b) => b.active).length
+      count: bans.filter((b) => isBanActive(b)).length
+    },
+    clients: {
+      online: onlineClients,
+      total: clients.length
     },
     paths: {
       gameDir,
@@ -258,6 +368,13 @@ module.exports = {
   ensurePanelData,
   readBans,
   saveBans,
+  findActiveBan,
+  isBanActive,
+  readClients,
+  upsertClientHeartbeat,
+  listOnlineClients,
+  enqueueCommand,
+  pullCommandsForHwid,
   readSessions,
   appendSessionRecord,
   appendActivity,

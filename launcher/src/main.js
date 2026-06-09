@@ -1,9 +1,8 @@
 'use strict';
 
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const { spawn } = require('child_process');
 
 if (process.platform === 'win32') {
   app.commandLine.appendSwitch('force-high-performance-gpu');
@@ -24,12 +23,13 @@ const {
   isErrorLogLine,
   sendEncryptedLogReport
 } = require('./log-report');
+const { startPanelClientLoop, getMachineHwid } = require('./panel-client');
 const {
   appendSessionRecord,
   appendActivity,
-  appendLauncherJournalLine
+  appendLauncherJournalLine,
+  findActiveBan
 } = require('./panel-store');
-const { isDevRuntime, findPanelExe } = require('./paths');
 
 let mainWindow = null;
 const launcher = new GameLauncher();
@@ -47,6 +47,7 @@ let sessionStartedAt = new Date().toISOString();
 let quitReportInProgress = false;
 let quitReportDone = false;
 let sessionPersisted = false;
+let stopPanelClient = null;
 
 function flushLogBuffer() {
   logFlushTimer = null;
@@ -66,6 +67,55 @@ function recordSessionEvent(type, detail) {
     type: entry.type,
     detail: entry.detail
   }).catch(() => {});
+}
+
+function handlePanelCommand(cmd) {
+  const type = String(cmd?.type || '');
+  if (type === 'close-launcher') {
+    const reason = cmd.payload?.reason || 'Лаунчер закрыт администратором';
+    recordSessionEvent('panel-close', reason);
+    if (mainWindow) {
+      dialog.showMessageBox(mainWindow, {
+        type: 'warning',
+        title: 'Project Global Conflict',
+        message: reason
+      }).finally(() => app.quit());
+    } else {
+      app.quit();
+    }
+    return;
+  }
+  if (type === 'stop-game') {
+    if (launcher.stopGame()) {
+      recordSessionEvent('panel-stop-game', 'game-killed');
+    }
+    return;
+  }
+  if (type === 'message') {
+    const text = String(cmd.payload?.text || 'Сообщение от администратора');
+    recordSessionEvent('panel-message', text.slice(0, 200));
+    if (mainWindow) {
+      dialog.showMessageBox(mainWindow, {
+        type: 'info',
+        title: 'Администратор',
+        message: text
+      }).catch(() => {});
+    }
+  }
+}
+
+function handlePanelBan(reason) {
+  const msg = reason || 'Доступ заблокирован администратором';
+  recordSessionEvent('panel-ban', msg);
+  if (mainWindow) {
+    dialog.showMessageBox(mainWindow, {
+      type: 'error',
+      title: 'Доступ заблокирован',
+      message: msg
+    }).finally(() => app.quit());
+  } else {
+    app.quit();
+  }
 }
 
 async function persistSessionRecord(outcome, detail) {
@@ -205,10 +255,16 @@ function createWindow() {
   });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   recordSessionEvent('launcher-start', sessionStartedAt);
   applyDiscreteGpuToProcessEnv();
   applyLauncherCpuLimit(MAX_CPU_PERCENT, process.pid);
+  stopPanelClient = startPanelClientLoop({
+    getUsername: () => loadSettings().username || null,
+    isGameRunning: () => Boolean(launcher.gameRunning),
+    onBanned: handlePanelBan,
+    onCommand: handlePanelCommand
+  });
   createWindow();
   mainWindow.webContents.once('did-finish-load', () => {
     launcher.startBackgroundUpdateLoop();
@@ -343,6 +399,10 @@ ipcMain.handle('game:launch', async (_e, username) => {
     if (!nick) {
       return { ok: false, error: 'Введите ник.' };
     }
+    const ban = await findActiveBan({ player: nick, hwid: getMachineHwid() });
+    if (ban) {
+      return { ok: false, error: `Доступ заблокирован: ${ban.reason}` };
+    }
     const current = loadSettings();
     saveSettings({ ...current, username: nick.toLowerCase() });
     await launcher.launch(nick);
@@ -354,28 +414,9 @@ ipcMain.handle('game:launch', async (_e, username) => {
   }
 });
 
-function launchPanelApp() {
-  const panelExe = findPanelExe();
-  if (panelExe) {
-    return shell.openPath(panelExe).then((err) => (err ? { ok: false, error: err } : { ok: true }));
-  }
-  if (isDevRuntime()) {
-    const panelMain = path.join(__dirname, 'panel-app-main.js');
-    spawn(process.execPath, [panelMain], {
-      cwd: path.join(__dirname, '..'),
-      detached: true,
-      stdio: 'ignore',
-      windowsHide: true
-    }).unref();
-    return Promise.resolve({ ok: true });
-  }
-  return Promise.resolve({
-    ok: false,
-    error: 'PGC Panel не найден. Соберите: npm run dist:panel'
-  });
-}
-
-ipcMain.handle('panel:open', () => launchPanelApp());
-
 ipcMain.on('window:minimize', () => mainWindow?.minimize());
 ipcMain.on('window:close', () => mainWindow?.close());
+
+app.on('will-quit', () => {
+  stopPanelClient?.();
+});

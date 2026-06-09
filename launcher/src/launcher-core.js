@@ -7,6 +7,7 @@ const fs = require('fs');
 const fsp = require('fs/promises');
 const os = require('os');
 const crypto = require('crypto');
+const { execSync } = require('child_process');
 const { download } = require('./download');
 
 const config = require('./config');
@@ -90,6 +91,7 @@ class GameLauncher extends EventEmitter {
     this.gameDir = getGameDir();
     this.client = new Client();
     this.gameRunning = false;
+    this.gameProc = null;
     this.syncInProgress = false;
     this.backgroundUpdateTimer = null;
   }
@@ -430,6 +432,23 @@ class GameLauncher extends EventEmitter {
     return dest;
   }
 
+  stopGame() {
+    if (!this.gameProc) return false;
+    try {
+      const pid = this.gameProc.pid;
+      if (process.platform === 'win32') {
+        execSync(`taskkill /PID ${pid} /T /F`, { stdio: 'ignore', windowsHide: true });
+      } else {
+        this.gameProc.kill('SIGTERM');
+      }
+      this.gameRunning = false;
+      this.gameProc = null;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   resolveMemory() {
     const s = this.loadLauncherSettings();
     const cap = Number(config.memory?.maxCap) || 16384;
@@ -499,6 +518,7 @@ class GameLauncher extends EventEmitter {
     this.client.on('arguments', () => this.status('Запуск Minecraft…', 1));
     this.client.on('close', async (code) => {
       this.gameRunning = false;
+      this.gameProc = null;
       this.emit('game-close', code);
       this.syncModpackOnStartup().catch(() => {});
     });
@@ -516,6 +536,7 @@ class GameLauncher extends EventEmitter {
 
     this.status('Игра запущена', 1);
     this.gameRunning = true;
+    this.gameProc = proc;
     this.emit('launched');
     return proc;
   }
