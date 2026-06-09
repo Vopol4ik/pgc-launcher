@@ -162,10 +162,20 @@
             <button id="settings-close" class="tb-btn modal-close" type="button" title="Закрыть">&#10005;</button>
           </div>
           <div class="settings-body">
-            <label class="field-label" for="memory-min">ОЗУ минимум (МБ)</label>
-            <select id="memory-min" class="settings-select"></select>
-            <label class="field-label" for="memory-max">ОЗУ максимум (МБ)</label>
-            <select id="memory-max" class="settings-select"></select>
+            <div class="memory-slider-block">
+              <div class="memory-slider-head">
+                <label class="field-label" for="memory-min">ОЗУ минимум</label>
+                <span class="memory-slider-value" id="memory-min-value">4096 МБ</span>
+              </div>
+              <input id="memory-min" class="settings-range" type="range" min="0" max="0" step="1" aria-valuemin="2048" aria-valuemax="28672" />
+            </div>
+            <div class="memory-slider-block">
+              <div class="memory-slider-head">
+                <label class="field-label" for="memory-max">ОЗУ максимум</label>
+                <span class="memory-slider-value" id="memory-max-value">12288 МБ</span>
+              </div>
+              <input id="memory-max" class="settings-range" type="range" min="0" max="0" step="1" aria-valuemin="2048" aria-valuemax="28672" />
+            </div>
             <label class="field-label" for="ui-font">Шрифт интерфейса</label>
             <select id="ui-font" class="settings-select"></select>
             <label class="settings-check">

@@ -27,6 +27,8 @@ const registerHint = $('register-hint');
 const registerSubmit = $('register-submit');
 const memoryMin = $('memory-min');
 const memoryMax = $('memory-max');
+const memoryMinValue = $('memory-min-value');
+const memoryMaxValue = $('memory-max-value');
 const uiFontSelect = $('ui-font');
 const fullscreenCb = $('fullscreen');
 const UI_FONTS = [
@@ -442,10 +444,9 @@ async function init() {
   }
 
   memoryOptions = appInfo.memoryOptions || [2048, 4096, 8192];
-  fillMemorySelect(memoryMin, memoryOptions);
-  fillMemorySelect(memoryMax, memoryOptions);
-  memoryMin.value = String(appInfo.settings.memoryMin || appInfo.defaults.memoryMin);
-  memoryMax.value = String(appInfo.settings.memoryMax || appInfo.defaults.memoryMax);
+  setupMemorySlider(memoryMin, memoryMinValue, memoryOptions, appInfo.settings.memoryMin || appInfo.defaults.memoryMin);
+  setupMemorySlider(memoryMax, memoryMaxValue, memoryOptions, appInfo.settings.memoryMax || appInfo.defaults.memoryMax);
+  bindMemorySliderSync();
   fillFontSelect(uiFontSelect);
   const uiFont = appInfo.settings.uiFont || appInfo.defaults.uiFont || 'default';
   uiFontSelect.value = UI_FONTS.some((f) => f.id === uiFont) ? uiFont : 'default';
@@ -463,14 +464,64 @@ async function init() {
   }
 }
 
-function fillMemorySelect(select, values) {
-  select.innerHTML = '';
-  for (const mb of values) {
-    const opt = document.createElement('option');
-    opt.value = String(mb);
-    opt.textContent = `${mb} МБ (${(mb / 1024).toFixed(1)} ГБ)`;
-    select.appendChild(opt);
+function formatMemoryMb(mb) {
+  return `${mb} МБ (${(mb / 1024).toFixed(1)} ГБ)`;
+}
+
+function snapMemoryIndex(options, mb) {
+  if (!options.length) return 0;
+  let best = 0;
+  let bestDiff = Infinity;
+  for (let i = 0; i < options.length; i++) {
+    const diff = Math.abs(options[i] - mb);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      best = i;
+    }
   }
+  return best;
+}
+
+function memoryMbFromSlider(slider) {
+  return memoryOptions[Number(slider.value)] || memoryOptions[0];
+}
+
+function updateMemorySliderLabel(slider, valueEl) {
+  const mb = memoryMbFromSlider(slider);
+  valueEl.textContent = formatMemoryMb(mb);
+  slider.setAttribute('aria-valuenow', String(mb));
+}
+
+function setupMemorySlider(slider, valueEl, options, initialMb) {
+  slider.min = '0';
+  slider.max = String(Math.max(0, options.length - 1));
+  slider.step = '1';
+  slider.value = String(snapMemoryIndex(options, initialMb));
+  updateMemorySliderLabel(slider, valueEl);
+}
+
+function bindMemorySliderSync() {
+  memoryMin.addEventListener('input', () => {
+    updateMemorySliderLabel(memoryMin, memoryMinValue);
+    if (Number(memoryMin.value) > Number(memoryMax.value)) {
+      memoryMax.value = memoryMin.value;
+      updateMemorySliderLabel(memoryMax, memoryMaxValue);
+    }
+  });
+  memoryMax.addEventListener('input', () => {
+    updateMemorySliderLabel(memoryMax, memoryMaxValue);
+    if (Number(memoryMax.value) < Number(memoryMin.value)) {
+      memoryMin.value = memoryMax.value;
+      updateMemorySliderLabel(memoryMin, memoryMinValue);
+    }
+  });
+}
+
+function readMemorySettings() {
+  let min = memoryMbFromSlider(memoryMin);
+  let max = memoryMbFromSlider(memoryMax);
+  if (min > max) [min, max] = [max, min];
+  return { memoryMin: min, memoryMax: max };
 }
 
 function fillFontSelect(select) {
@@ -532,9 +583,7 @@ registerNick?.addEventListener('keydown', (e) => {
 });
 
 settingsSave.addEventListener('click', async () => {
-  let min = Number(memoryMin.value);
-  let max = Number(memoryMax.value);
-  if (min > max) [min, max] = [max, min];
+  const { memoryMin: min, memoryMax: max } = readMemorySettings();
   const uiFont = UI_FONTS.some((f) => f.id === uiFontSelect.value) ? uiFontSelect.value : 'default';
   const saved = await window.svo.saveSettings({
     memoryMin: min,
