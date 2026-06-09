@@ -5,6 +5,10 @@ const https = require('https');
 const { URL } = require('url');
 const config = require('./config');
 const { getMachineHwid } = require('./hwid');
+const {
+  readPendingRegistration,
+  clearPendingRegistration
+} = require('./registration-store');
 
 function panelBaseUrl() {
   const remote = String(config.panel?.remoteUrl || '').trim();
@@ -53,6 +57,24 @@ function requestJson(pathname, { method = 'GET', body } = {}) {
   });
 }
 
+async function syncPendingRegistration() {
+  const pending = await readPendingRegistration();
+  if (!pending) return { ok: true, skipped: true };
+  try {
+    const res = await requestJson('/api/client/register', {
+      method: 'POST',
+      body: pending
+    });
+    if (res?.synced) {
+      await clearPendingRegistration();
+      return { ok: true, synced: true };
+    }
+    return { ok: false, offline: false };
+  } catch {
+    return { ok: false, offline: true };
+  }
+}
+
 async function syncClientState(state) {
   try {
     return await requestJson('/api/client/heartbeat', {
@@ -81,6 +103,7 @@ function startPanelClientLoop(handlers) {
       gameRunning: handlers.isGameRunning?.() || false
     };
     const res = await syncClientState(state);
+    await syncPendingRegistration();
     if (res?.banned) {
       handlers.onBanned?.(res.reason || 'Доступ заблокирован');
       return;
@@ -104,5 +127,6 @@ module.exports = {
   panelBaseUrl,
   getMachineHwid,
   syncClientState,
+  syncPendingRegistration,
   startPanelClientLoop
 };

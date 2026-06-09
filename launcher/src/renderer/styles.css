@@ -1185,7 +1185,8 @@ html, body {
   user-select: text;
 }
 
-.settings-overlay {
+.settings-overlay,
+.modal-overlay {
   position: fixed;
   inset: 40px 0 0 0;
   z-index: 20;
@@ -1194,7 +1195,33 @@ html, body {
   justify-content: center;
   background: rgba(4, 6, 10, 0.72);
   backdrop-filter: blur(6px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.28s ease, visibility 0.28s ease;
 }
+
+.modal-overlay.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.modal-panel {
+  transform: translateY(14px) scale(0.96);
+  opacity: 0;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.28s ease;
+}
+
+.modal-overlay.is-open .modal-panel {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+
+#register-overlay {
+  z-index: 30;
+}
+
 .settings-panel {
   width: min(420px, calc(100% - 48px));
   max-height: min(560px, calc(100vh - 80px));
@@ -1255,5 +1282,50 @@ html, body {
   margin-top: 4px;
 }
 .settings-save { margin-top: calc(14px * var(--ui-scale)); height: calc(46px * var(--ui-scale)); font-size: calc(15px * var(--ui-scale)); }
+
+.profile-nick-display {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.3px;
+  padding: 8px 0 2px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shop-panel { min-height: 280px; }
+
+.shop-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  min-height: 180px;
+  padding: 24px 12px 8px;
+}
+
+.shop-empty-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 1px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2, #1f6feb));
+  opacity: 0.55;
+}
+
+.shop-empty-text {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.field-hint.error { color: var(--danger, #f85149); font-size: 12px; margin-top: 4px; }
 
 .hidden { display: none; }

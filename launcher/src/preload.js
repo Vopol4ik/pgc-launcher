@@ -4,6 +4,8 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('svo', {
   getInfo: () => ipcRenderer.invoke('app:info'),
+  getAuthStatus: () => ipcRenderer.invoke('auth:status'),
+  register: (data) => ipcRenderer.invoke('auth:register', data),
   getNews: () => ipcRenderer.invoke('news:fetch'),
   getServerStatus: () => ipcRenderer.invoke('server:status'),
   saveSettings: (data) => ipcRenderer.invoke('settings:save', data),

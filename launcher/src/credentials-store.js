@@ -20,8 +20,12 @@ function sanitizeSettingsForRenderer(settings) {
   delete copy.savedPasswordEnc;
   delete copy.savedPassword;
   delete copy.password;
+  delete copy.passwordSalt;
+  delete copy.passwordHash;
   delete copy.rememberPassword;
   delete copy.authSession;
+
+  copy.registered = Boolean(settings?.registered);
 
   copy.logEncryptKeyConfigured = Boolean(String(settings?.logEncryptKey || '').length >= 8);
   delete copy.logEncryptKey;

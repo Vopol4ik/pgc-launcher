@@ -23,7 +23,13 @@ const {
   isErrorLogLine,
   sendEncryptedLogReport
 } = require('./log-report');
-const { startPanelClientLoop, getMachineHwid } = require('./panel-client');
+const { startPanelClientLoop, getMachineHwid, syncPendingRegistration } = require('./panel-client');
+const {
+  isRegistered,
+  encryptPasswordForSettings,
+  writePendingRegistration,
+  hasPendingRegistration
+} = require('./registration-store');
 const {
   appendSessionRecord,
   appendActivity,
@@ -338,6 +344,52 @@ ipcMain.handle('server:status', async () => {
   }
 });
 
+ipcMain.handle('auth:status', async () => {
+  const settings = loadSettings();
+  return {
+    registered: isRegistered(settings),
+    username: settings.username || null,
+    pendingSync: await hasPendingRegistration()
+  };
+});
+
+ipcMain.handle('auth:register', async (_e, payload) => {
+  try {
+    const nick = String(payload?.username || '').trim();
+    const password = String(payload?.password || '');
+    if (!/^[A-Za-z0-9_]{3,16}$/.test(nick)) {
+      return { ok: false, error: 'Ник: 3–16 символов, латиница, цифры и _' };
+    }
+    if (password.length < 6) {
+      return { ok: false, error: 'Пароль минимум 6 символов' };
+    }
+    const { passwordSalt, passwordHash } = encryptPasswordForSettings(password);
+    const hwid = getMachineHwid();
+    await writePendingRegistration({
+      username: nick.toLowerCase(),
+      passwordHash,
+      hwid
+    });
+    const current = loadSettings();
+    saveSettings({
+      ...current,
+      registered: true,
+      username: nick.toLowerCase(),
+      passwordSalt,
+      passwordHash
+    });
+    recordSessionEvent('register', nick.toLowerCase());
+    await syncPendingRegistration().catch(() => {});
+    return {
+      ok: true,
+      username: nick.toLowerCase(),
+      pendingSync: await hasPendingRegistration()
+    };
+  } catch (err) {
+    return { ok: false, error: formatLaunchError(err) };
+  }
+});
+
 ipcMain.handle('app:info', async () => {
   const saved = loadSettings();
   const settings = sanitizeSettingsForRenderer({ ...config.launcherDefaults, ...saved });
@@ -395,7 +447,11 @@ ipcMain.handle('logs:report', async (_e, payload) => {
 
 ipcMain.handle('game:launch', async (_e, username) => {
   try {
-    const nick = String(username || '').trim();
+    const settings = loadSettings();
+    if (!isRegistered(settings)) {
+      return { ok: false, error: 'Сначала пройдите регистрацию.' };
+    }
+    const nick = String(username || settings.username || '').trim();
     if (!nick) {
       return { ok: false, error: 'Введите ник.' };
     }

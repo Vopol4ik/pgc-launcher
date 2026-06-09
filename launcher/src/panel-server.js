@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { URL } = require('url');
 const config = require('./config');
+const { appendRegistrationEntry } = require('./registration-git');
 const {
   ensurePanelData,
   readBans,
@@ -102,6 +103,35 @@ async function handleClientApi(req, res, url) {
       banned: Boolean(ban),
       reason: ban?.reason || null,
       commands
+    });
+  }
+
+  if (req.method === 'POST' && url.pathname === '/api/client/register') {
+    const raw = await readBody(req);
+    let body;
+    try {
+      body = JSON.parse(raw || '{}');
+    } catch {
+      return json(res, 400, { ok: false, error: 'Некорректный JSON' });
+    }
+    const username = String(body.username || '').trim().toLowerCase();
+    const hwid = String(body.hwid || '').toLowerCase();
+    if (!username || !/^[a-z0-9_]{3,16}$/.test(username)) {
+      return json(res, 400, { ok: false, error: 'Некорректный ник' });
+    }
+    if (!hwid) {
+      return json(res, 400, { ok: false, error: 'HWID обязателен' });
+    }
+    const entry = {
+      username,
+      hwid,
+      createdAt: body.createdAt || new Date().toISOString()
+    };
+    const gitResult = await appendRegistrationEntry(entry);
+    return json(res, 200, {
+      ok: true,
+      synced: Boolean(gitResult.ok || gitResult.duplicate),
+      git: gitResult
     });
   }
 

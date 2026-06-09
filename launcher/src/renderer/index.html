@@ -32,6 +32,9 @@
 
       <div class="sidebar-bottom">
         <nav class="sidebar-nav">
+          <button id="shop-btn" class="sidebar-nav-btn" type="button" title="Магазин">
+            <span class="sidebar-nav-label">Магазин</span>
+          </button>
           <button id="settings-btn" class="sidebar-nav-btn" type="button" title="Настройки">
             <span class="sidebar-nav-label">Настройки</span>
           </button>
@@ -44,8 +47,7 @@
           <button type="button" class="profile-avatar" id="profile-avatar" title="Сменить аватар" aria-label="Сменить аватар">?</button>
           <input id="avatar-input" class="avatar-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif" tabindex="-1" />
           <div class="profile-fields">
-            <input id="nickname" class="profile-nick-input" type="text" maxlength="16" placeholder="Ник" autocomplete="username" aria-label="Игровой ник" />
-            <div class="field-hint profile-nick-hint" id="nick-hint"></div>
+            <div class="profile-nick-display" id="profile-nick">—</div>
           </div>
         </div>
       </div>
@@ -153,11 +155,11 @@
         <span id="version-label" class="version-label">Minecraft 1.20.1 · Forge</span>
       </div>
 
-      <div id="settings-overlay" class="settings-overlay hidden" aria-hidden="true">
-        <div class="settings-panel" role="dialog" aria-labelledby="settings-title">
+      <div id="settings-overlay" class="modal-overlay" aria-hidden="true">
+        <div class="modal-panel settings-panel" role="dialog" aria-labelledby="settings-title">
           <div class="settings-head">
             <h2 id="settings-title">Системные настройки</h2>
-            <button id="settings-close" class="tb-btn" type="button" title="Закрыть">&#10005;</button>
+            <button id="settings-close" class="tb-btn modal-close" type="button" title="Закрыть">&#10005;</button>
           </div>
           <div class="settings-body">
             <label class="field-label" for="memory-min">ОЗУ минимум (МБ)</label>
@@ -173,6 +175,36 @@
             <p class="settings-note">Игра: чувствительность 67%, прорисовка 28, симуляция 5. R не занят перезагрузкой шейдеров.</p>
           </div>
           <button id="settings-save" class="play-btn settings-save" type="button"><span>СОХРАНИТЬ</span></button>
+        </div>
+      </div>
+
+      <div id="register-overlay" class="modal-overlay" aria-hidden="true">
+        <div class="modal-panel settings-panel" role="dialog" aria-labelledby="register-title">
+          <div class="settings-head">
+            <h2 id="register-title">Регистрация</h2>
+          </div>
+          <div class="settings-body">
+            <p class="settings-note">Создайте аккаунт для входа в Project Global Conflict.</p>
+            <label class="field-label" for="register-nick">Ник</label>
+            <input id="register-nick" class="settings-input" type="text" maxlength="16" placeholder="3–16 символов" autocomplete="username" />
+            <label class="field-label" for="register-password">Пароль</label>
+            <input id="register-password" class="settings-input" type="password" maxlength="64" placeholder="Минимум 6 символов" autocomplete="new-password" />
+            <div class="field-hint" id="register-hint"></div>
+          </div>
+          <button id="register-submit" class="play-btn settings-save" type="button"><span>ЗАРЕГИСТРИРОВАТЬСЯ</span></button>
+        </div>
+      </div>
+
+      <div id="shop-overlay" class="modal-overlay" aria-hidden="true">
+        <div class="modal-panel settings-panel shop-panel" role="dialog" aria-labelledby="shop-title">
+          <div class="settings-head">
+            <h2 id="shop-title">Магазин</h2>
+            <button id="shop-close" class="tb-btn modal-close" type="button" title="Закрыть">&#10005;</button>
+          </div>
+          <div class="shop-empty">
+            <div class="shop-empty-icon">PGC</div>
+            <p class="shop-empty-text">Магазин скоро откроется.</p>
+          </div>
         </div>
       </div>
     </div>

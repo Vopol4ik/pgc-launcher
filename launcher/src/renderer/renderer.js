@@ -2,8 +2,7 @@
 
 const $ = (id) => document.getElementById(id);
 
-const nickInput = $('nickname');
-const nickHint = $('nick-hint');
+const profileNick = $('profile-nick');
 const profileAvatar = $('profile-avatar');
 const avatarInput = $('avatar-input');
 const playBtn = $('play-btn');
@@ -14,10 +13,18 @@ const logPanel = $('log-panel');
 const logToggle = $('log-toggle');
 const logClose = $('log-close');
 const logClear = $('log-clear');
+const shopBtn = $('shop-btn');
+const shopOverlay = $('shop-overlay');
+const shopClose = $('shop-close');
 const settingsBtn = $('settings-btn');
 const settingsOverlay = $('settings-overlay');
 const settingsClose = $('settings-close');
 const settingsSave = $('settings-save');
+const registerOverlay = $('register-overlay');
+const registerNick = $('register-nick');
+const registerPassword = $('register-password');
+const registerHint = $('register-hint');
+const registerSubmit = $('register-submit');
 const memoryMin = $('memory-min');
 const memoryMax = $('memory-max');
 const uiFontSelect = $('ui-font');
@@ -45,6 +52,8 @@ let serverStatusTimer = null;
 let newsPollTimer = null;
 let lastNewsUpdatedAt = null;
 let customAvatarUrl = '';
+let registered = false;
+let currentUsername = '';
 
 function applyAvatarImage(dataUrl) {
   if (!profileAvatar) return;
@@ -62,8 +71,14 @@ function applyAvatarImage(dataUrl) {
 
 function updateProfileAvatarLetter() {
   if (!profileAvatar || profileAvatar.classList.contains('has-image')) return;
-  const v = nickInput.value.trim();
-  profileAvatar.textContent = v ? v.charAt(0).toUpperCase() : '?';
+  profileAvatar.textContent = currentUsername ? currentUsername.charAt(0).toUpperCase() : '?';
+}
+
+function setProfileUsername(name) {
+  currentUsername = String(name || '').trim();
+  if (profileNick) profileNick.textContent = currentUsername || '—';
+  updateProfileAvatarLetter();
+  updateActions();
 }
 
 function resizeAvatarFile(file) {
@@ -123,33 +138,67 @@ function setStatus(text, progress, updating) {
   }
 }
 
-function updateProfileAvatar() {
-  updateProfileAvatarLetter();
-}
-
-function nickValid() {
-  return NICK_RE.test(nickInput.value.trim());
+function nickValid(name) {
+  return NICK_RE.test(String(name || '').trim());
 }
 
 function updateActions() {
-  playBtn.disabled = !nickValid() || launching;
+  playBtn.disabled = !registered || !nickValid(currentUsername) || launching;
 }
 
-function validateNick() {
-  const v = nickInput.value.trim();
-  if (v.length === 0) {
-    nickHint.textContent = '';
-    nickHint.classList.remove('error');
-  } else if (!nickValid()) {
-    nickHint.textContent = 'Ник: 3–16 символов, латиница, цифры и _';
-    nickHint.classList.add('error');
-  } else {
-    nickHint.textContent = '';
-    nickHint.classList.remove('error');
+function openModal(overlay) {
+  if (!overlay) return;
+  overlay.classList.add('is-open');
+  overlay.setAttribute('aria-hidden', 'false');
+}
+
+function closeModal(overlay) {
+  if (!overlay) return;
+  overlay.classList.remove('is-open');
+  overlay.setAttribute('aria-hidden', 'true');
+}
+
+function openSettings() {
+  openModal(settingsOverlay);
+}
+
+function closeSettings() {
+  closeModal(settingsOverlay);
+}
+
+function openShop() {
+  openModal(shopOverlay);
+}
+
+function closeShop() {
+  closeModal(shopOverlay);
+}
+
+function openRegister() {
+  openModal(registerOverlay);
+  registerNick?.focus();
+}
+
+function closeRegister() {
+  closeModal(registerOverlay);
+}
+
+function validateRegisterForm() {
+  const nick = registerNick?.value.trim() || '';
+  const pass = registerPassword?.value || '';
+  if (!nickValid(nick)) {
+    registerHint.textContent = 'Ник: 3–16 символов, латиница, цифры и _';
+    registerHint.classList.add('error');
+    return null;
   }
-  updateActions();
-  updateProfileAvatar();
-  return nickValid();
+  if (pass.length < 6) {
+    registerHint.textContent = 'Пароль минимум 6 символов';
+    registerHint.classList.add('error');
+    return null;
+  }
+  registerHint.textContent = '';
+  registerHint.classList.remove('error');
+  return { username: nick, password: pass };
 }
 
 function scheduleLogPaint() {
@@ -377,14 +426,16 @@ function startServerStatusPolling() {
 
 async function init() {
   appInfo = await window.svo.getInfo();
+  const auth = await window.svo.getAuthStatus();
+  registered = Boolean(auth?.registered);
   document.title = appInfo.brand.title;
   const titleEl = document.querySelector('.titlebar-title');
   if (titleEl) titleEl.textContent = `${appInfo.brand.titlebar || appInfo.brand.name} · v${appInfo.appVersion}`;
   $('version-label').textContent =
     `Launcher ${appInfo.appVersion} · MC ${appInfo.version} · Forge ${appInfo.forge} · Java ${appInfo.javaMajor}`;
 
-  if (appInfo.settings?.username) {
-    nickInput.value = appInfo.settings.username;
+  if (auth?.username || appInfo.settings?.username) {
+    setProfileUsername(auth?.username || appInfo.settings.username);
   }
   if (appInfo.settings?.avatarDataUrl) {
     applyAvatarImage(appInfo.settings.avatarDataUrl);
@@ -401,11 +452,15 @@ async function init() {
   applyUiFont(uiFontSelect.value);
   fullscreenCb.checked = Boolean(appInfo.settings.fullscreen);
 
-  validateNick();
+  updateActions();
   startNewsSidebarSync();
   await loadNews();
   startNewsPolling();
   startServerStatusPolling();
+
+  if (!registered) {
+    openRegister();
+  }
 }
 
 function fillMemorySelect(select, values) {
@@ -438,20 +493,42 @@ function applyUiFont(fontId) {
   document.documentElement.style.setProperty('--ui-font', resolveUiFontStack(fontId));
 }
 
-function openSettings() {
-  settingsOverlay.classList.remove('hidden');
-  settingsOverlay.setAttribute('aria-hidden', 'false');
-}
-
-function closeSettings() {
-  settingsOverlay.classList.add('hidden');
-  settingsOverlay.setAttribute('aria-hidden', 'true');
-}
+shopBtn?.addEventListener('click', openShop);
+shopClose?.addEventListener('click', closeShop);
+shopOverlay?.addEventListener('click', (e) => {
+  if (e.target === shopOverlay) closeShop();
+});
 
 settingsBtn.addEventListener('click', openSettings);
 settingsClose.addEventListener('click', closeSettings);
 settingsOverlay.addEventListener('click', (e) => {
   if (e.target === settingsOverlay) closeSettings();
+});
+
+registerSubmit?.addEventListener('click', async () => {
+  const payload = validateRegisterForm();
+  if (!payload) return;
+  registerSubmit.disabled = true;
+  registerSubmit.querySelector('span').textContent = 'Регистрация…';
+  const res = await window.svo.register(payload);
+  registerSubmit.disabled = false;
+  registerSubmit.querySelector('span').textContent = 'ЗАРЕГИСТРИРОВАТЬСЯ';
+  if (!res.ok) {
+    registerHint.textContent = res.error || 'Ошибка регистрации';
+    registerHint.classList.add('error');
+    return;
+  }
+  registered = true;
+  setProfileUsername(res.username);
+  closeRegister();
+  setStatus('Регистрация завершена', 0);
+});
+
+registerPassword?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') registerSubmit?.click();
+});
+registerNick?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') registerPassword?.focus();
 });
 
 settingsSave.addEventListener('click', async () => {
@@ -476,31 +553,22 @@ uiFontSelect.addEventListener('change', () => {
 });
 
 playBtn.addEventListener('click', async () => {
-  if (!validateNick() || launching) return;
+  if (!registered || !nickValid(currentUsername) || launching) return;
 
   launching = true;
   updateActions();
   playBtn.querySelector('span').textContent = 'Запуск…';
   setStatus('Подготовка…', 0);
 
-  const username = nickInput.value.trim();
-  await window.svo.saveSettings({ username });
-
-  const res = await window.svo.launch(username);
+  const res = await window.svo.launch(currentUsername);
   if (!res.ok) {
     setStatus(`Ошибка: ${res.error}`, 0);
-    nickHint.textContent = res.error;
-    nickHint.classList.add('error');
+    if (!registered) openRegister();
     setLogOpen(true);
     launching = false;
     playBtn.querySelector('span').textContent = 'Играть';
     updateActions();
   }
-});
-
-nickInput.addEventListener('input', validateNick);
-nickInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') playBtn.click();
 });
 
 profileAvatar?.addEventListener('click', () => avatarInput?.click());
@@ -580,7 +648,7 @@ window.svo.onGameClose((code) => {
   } else {
     setStatus('Игра закрыта', 0);
   }
-  validateNick();
+  updateActions();
 });
 
 init();
