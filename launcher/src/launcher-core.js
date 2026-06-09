@@ -131,9 +131,11 @@ class GameLauncher extends EventEmitter {
   startBackgroundUpdateLoop() {
     this.stopBackgroundUpdateLoop();
     const ms = Number(config.updatePollIntervalMs) || 120000;
-    this.backgroundUpdateTimer = setInterval(() => {
+    const tick = () => {
       this.syncModpackOnStartup({ quiet: true }).catch(() => {});
-    }, ms);
+    };
+    tick();
+    this.backgroundUpdateTimer = setInterval(tick, ms);
   }
 
   stopBackgroundUpdateLoop() {
@@ -314,12 +316,46 @@ class GameLauncher extends EventEmitter {
       (t, p) => this.modpackStatusCallback(t, p)
     );
     await applyManifestRemovals(this.gameDir, null);
-    if (result.updated && !quiet) {
-      this.log(`Сборка обновлена: ${result.fileCount} файл(ов), рев. ${check.revision ?? '?'}.`);
+    if (result.updated) {
+      const msg = `Сборка обновлена: ${result.fileCount} файл(ов), рев. ${check.revision ?? '?'}.`;
+      this.log(quiet ? `[фон] ${msg}` : msg);
+      this.emit('modpack-updated', {
+        revision: check.revision ?? null,
+        fileCount: result.fileCount
+      });
     }
     await this.stripBlockedMods(path.join(this.gameDir, 'mods'));
     this.status('Готов к запуску', 0, { updating: false });
     return result;
+  }
+
+  async refreshModpackStateFromManifest() {
+    let manifest = null;
+    try {
+      const resolved = await resolveManifest();
+      manifest = resolved.manifest;
+      if (resolved.source === 'remote') {
+        this.log(`Манифест с GitHub: рев. ${manifest?.revision ?? '?'}.`);
+      }
+    } catch {
+      manifest = resolveBundledManifest();
+    }
+    if (manifest) {
+      await refreshStateFromDisk(this.gameDir, manifest);
+    }
+  }
+
+  async ensureModpackBaseline({ quiet = false } = {}) {
+    if (!(await this.modsNeedInstall())) return false;
+    if (!quiet) {
+      this.status('Загрузка сборки…', 0, { updating: true });
+      this.log('Загрузка сборки с GitHub…');
+    } else {
+      this.log('[фон] Загрузка сборки…');
+    }
+    await this.extractEmbeddedModpack();
+    await this.refreshModpackStateFromManifest();
+    return true;
   }
 
   /** Синхронизация при открытии лаунчера (до нажатия «Играть»). */
@@ -328,24 +364,23 @@ class GameLauncher extends EventEmitter {
     this.syncInProgress = true;
     try {
       await fsp.mkdir(this.gameDir, { recursive: true });
-      if (await this.modsNeedInstall()) {
-        if (!quiet) {
-          this.log('Первая установка — нажмите «Играть» для загрузки сборки с GitHub.');
-          this.status('Нажмите «Играть» — загрузка сборки (~1.7 ГБ)', 0);
-        }
-        return { ok: true, skipped: true, firstInstall: true };
-      }
+      await this.ensureModpackBaseline({ quiet });
+
       const resolved = await resolveManifest();
       if (!quiet && resolved.source !== 'remote') {
         this.log(`Манифест: ${resolved.source === 'bundled' ? 'локальная копия (GitHub недоступен)' : 'не найден'}.`);
       }
-      await this.autoApplyModpackUpdates({ quiet });
+
+      const result = await this.autoApplyModpackUpdates({ quiet });
       const client = await ensureClientModJar(this.gameDir, null);
       const critical = await ensureCriticalModJars(this.gameDir, null);
       await this.stripBlockedMods(path.join(this.gameDir, 'mods'));
-      return { ok: true, updated: Boolean(client.updated || critical.updated) };
+      return {
+        ok: true,
+        updated: Boolean(result.updated || client.updated || critical.updated)
+      };
     } catch (e) {
-      this.log(`Обновление: ${e.message}`);
+      this.log(`${quiet ? '[фон] ' : ''}Обновление: ${e.message}`);
       this.status('Готов к запуску', 0, { updating: false });
       return { ok: false, error: e.message };
     } finally {
@@ -358,21 +393,7 @@ class GameLauncher extends EventEmitter {
     if (needMods) {
       this.status('Подготовка сборки…');
       await this.extractEmbeddedModpack();
-      let manifest = null;
-      try {
-        const resolved = await resolveManifest();
-        manifest = resolved.manifest;
-        if (resolved.source === 'remote') {
-          this.log(`Манифест с GitHub: ревизия ${manifest?.revision ?? '?'}.`);
-        }
-      } catch {
-        manifest = null;
-      }
-      if (!manifest) manifest = resolveBundledManifest();
-      if (manifest) {
-        await refreshStateFromDisk(this.gameDir, manifest);
-        this.log(`Состояние сборки: рев. ${manifest.revision}.`);
-      }
+      await this.refreshModpackStateFromManifest();
     } else {
       this.log('Модпак уже установлен — загрузка и распаковка пропущены.');
       await this.stripBlockedMods(path.join(this.gameDir, 'mods'));

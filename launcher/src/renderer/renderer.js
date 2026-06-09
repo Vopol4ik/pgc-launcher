@@ -678,9 +678,13 @@ $('close-btn').addEventListener('click', () => window.svo.close());
 
 window.svo.onStatus((s) => {
   setStatus(s);
-  if (s?.text && /обновлен|актуальн|Сборка обновлена/i.test(s.text)) {
+  if (s?.text && /обновлен|актуальн|Сборка обновлена|Загрузка сборки/i.test(s.text)) {
     loadNews();
   }
+});
+window.svo.onModpackUpdated?.(() => {
+  loadNews();
+  setStatus('Сборка обновлена', 0);
 });
 window.svo.onLog((m) => appendLog(m));
 window.svo.onLaunched(() => {

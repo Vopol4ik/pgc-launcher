@@ -243,6 +243,9 @@ function createWindow() {
 
   launcher.on('status', (s) => mainWindow?.webContents.send('launcher:status', s));
   launcher.on('log', (m) => queueLogLine(m));
+  launcher.on('modpack-updated', () => {
+    mainWindow?.webContents.send('launcher:modpack-updated');
+  });
   launcher.on('launched', () => {
     recordSessionEvent('game-launched');
     mainWindow?.webContents.send('launcher:launched');

@@ -1,5 +1,5 @@
 {
-  "launcherVersion": "2.1.4",
+  "launcherVersion": "2.1.5",
   "sha256": "6c929e4714ea491348e683d4adf33e985dbd154daa307364eab1adf9b8e3e4e7",
   "size": 1817405884,
   "url": "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/content.7z",
@@ -7,5 +7,5 @@
     "https://github.com/Vopol4ik/globalwar-updates/releases/download/modpack-latest/content.7z",
     "https://operativniki.minerent.io/launcher/content.7z"
   ],
-  "builtAt": "2026-06-09T22:03:37.345Z"
+  "builtAt": "2026-06-09T22:20:41.026Z"
 }

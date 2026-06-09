@@ -23,6 +23,12 @@ function pathMatchesRepo(pathname, gh) {
   return String(pathname || '').toLowerCase().startsWith(prefix);
 }
 
+function isMavenGameHost(host) {
+  return host === 'maven.minecraftforge.net'
+    || host === 'maven.minecraft.net'
+    || host.endsWith('.minecraftforge.net');
+}
+
 function isAdoptiumApiHost(host) {
   return host === 'api.adoptium.net';
 }
@@ -54,6 +60,7 @@ function isTrustedUrl(urlString, { allowMcsrvstat = false, allowGithubAssets = f
   const path = url.pathname;
 
   if (isAdoptiumApiHost(host)) return true;
+  if (isMavenGameHost(host)) return true;
   if (host === 'operativniki.minerent.io' && path.startsWith('/launcher/')) return true;
   if (allowMcsrvstat && host === 'api.mcsrvstat.us') return true;
   if (allowGithubAssets && isGithubAssetRedirect(urlString)) return true;
@@ -82,7 +89,7 @@ function assertTrustedUrl(urlString, options = {}) {
 
 function assertDownloadUrl(urlString, { redirect = false } = {}) {
   if (isTrustedUrl(urlString)) return;
-  if (redirect && isAdoptiumGithubUrl(urlString)) return;
+  if (redirect && (isAdoptiumGithubUrl(urlString) || isGithubAssetRedirect(urlString))) return;
   throw new Error(`Загрузка заблокирована: неразрешённый URL (${urlString})`);
 }
 

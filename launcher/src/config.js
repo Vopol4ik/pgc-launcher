@@ -146,8 +146,8 @@ module.exports = {
     releaseTag: contentUrls.releaseTag || github.releaseTag
   },
 
-  /** Пока лаунчер открыт — лёгкая проверка ревизии на GitHub (без полного хеширования модов). */
-  updatePollIntervalMs: 300000,
+  /** Пока лаунчер открыт — проверка обновлений modpack (без перезапуска). */
+  updatePollIntervalMs: 120000,
 
   /** JVM: меньше вылетов при долгой игре на тяжёлой сборке. */
   jvmArgs: [

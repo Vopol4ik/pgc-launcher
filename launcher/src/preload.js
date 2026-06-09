@@ -21,5 +21,6 @@ contextBridge.exposeInMainWorld('svo', {
     });
   },
   onLaunched: (cb) => ipcRenderer.on('launcher:launched', () => cb()),
+  onModpackUpdated: (cb) => ipcRenderer.on('launcher:modpack-updated', () => cb()),
   onGameClose: (cb) => ipcRenderer.on('launcher:game-close', (_e, code) => cb(code))
 });
