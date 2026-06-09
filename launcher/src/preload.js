@@ -6,21 +6,11 @@ contextBridge.exposeInMainWorld('svo', {
   getInfo: () => ipcRenderer.invoke('app:info'),
   getNews: () => ipcRenderer.invoke('news:fetch'),
   getServerStatus: () => ipcRenderer.invoke('server:status'),
-  login: (username, password, rememberPassword = true) =>
-    ipcRenderer.invoke('auth:login', { username, password, rememberPassword }),
-  checkLogin: (username) => ipcRenderer.invoke('auth:check', { username }),
-  register: (username, password, confirmPassword, rememberPassword = true) =>
-    ipcRenderer.invoke('auth:register', { username, password, confirmPassword, rememberPassword }),
-  logout: () => ipcRenderer.invoke('auth:logout'),
   saveSettings: (data) => ipcRenderer.invoke('settings:save', data),
   launch: (username) => ipcRenderer.invoke('game:launch', username),
-  checkUpdates: () => ipcRenderer.invoke('update:check'),
-  applyUpdates: () => ipcRenderer.invoke('update:apply'),
-  syncOnStartup: () => ipcRenderer.invoke('modpack:sync'),
+  openPanel: () => ipcRenderer.invoke('panel:open'),
   minimize: () => ipcRenderer.send('window:minimize'),
   close: () => ipcRenderer.send('window:close'),
-  setLogPanelOpen: (open, animate = true) =>
-    ipcRenderer.send('window:log-panel', { open: Boolean(open), animate }),
 
   onStatus: (cb) => ipcRenderer.on('launcher:status', (_e, s) => cb(s)),
   onLog: (cb) => {

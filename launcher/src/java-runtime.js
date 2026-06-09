@@ -159,4 +159,4 @@ async function ensureJava17WithFallback(runtimeDir, onProgress, onLog) {
   }
 }
 
-module.exports = { ensureJava17: ensureJava17WithFallback, javaMajorVersion, findSystemJava17 };
+module.exports = { ensureJava17: ensureJava17WithFallback };

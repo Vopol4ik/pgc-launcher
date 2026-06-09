@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PGC Panel</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="shell">
+    <div class="bg-glow" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">PGC</div>
+        <div>
+          <div class="brand-title">PROJECT GLOBAL CONFLICT</div>
+          <div class="brand-sub">Логи · игроки · баны · только этот ПК</div>
+        </div>
+      </div>
+      <div class="topbar-meta">
+        <span class="pill" id="panel-status">Загрузка…</span>
+        <span class="muted" id="panel-clock"></span>
+      </div>
+    </header>
+
+    <div class="layout">
+      <nav class="nav" aria-label="Разделы">
+        <button class="nav-btn is-active" data-view="dashboard" type="button">Обзор</button>
+        <button class="nav-btn" data-view="players" type="button">Игроки</button>
+        <button class="nav-btn" data-view="bans" type="button">Баны</button>
+        <button class="nav-btn" data-view="logs" type="button">Логи</button>
+        <button class="nav-btn" data-view="sessions" type="button">Сессии</button>
+      </nav>
+
+      <main class="main">
+        <section class="view is-active" id="view-dashboard">
+          <h1 class="view-title">Обзор</h1>
+          <div class="cards" id="dash-cards"></div>
+          <div class="grid-2">
+            <article class="card">
+              <h2 class="card-title">Сервер</h2>
+              <div id="dash-server" class="card-body muted">—</div>
+            </article>
+            <article class="card">
+              <h2 class="card-title">Текущая сессия лаунчера</h2>
+              <div id="dash-live" class="card-body log-box">—</div>
+            </article>
+          </div>
+        </section>
+
+        <section class="view" id="view-players">
+          <h1 class="view-title">Игроки</h1>
+          <p class="view-desc">Локальная история запусков с этого компьютера.</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr><th>Ник</th><th>Запусков</th><th>Последний визит</th><th>Событие</th></tr>
+              </thead>
+              <tbody id="players-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view" id="view-bans">
+          <h1 class="view-title">Баны</h1>
+          <p class="view-desc">Локальный список. Файл: <code id="bans-path">…</code></p>
+          <form class="ban-form" id="ban-form">
+            <input id="ban-player" class="input" placeholder="Ник" maxlength="16" required />
+            <input id="ban-reason" class="input" placeholder="Причина" maxlength="200" required />
+            <input id="ban-by" class="input" placeholder="Кто выдал" maxlength="64" />
+            <label class="check"><input id="ban-permanent" type="checkbox" checked /><span>Перманент</span></label>
+            <button class="btn" type="submit">Добавить / обновить</button>
+          </form>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr><th>Ник</th><th>Причина</th><th>Кем</th><th>До</th><th>Статус</th><th></th></tr>
+              </thead>
+              <tbody id="bans-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="view" id="view-logs">
+          <h1 class="view-title">Логи</h1>
+          <div class="tabs">
+            <button class="tab is-active" data-log="launcher" type="button">Лаунчер</button>
+            <button class="tab" data-log="game" type="button">Игра (latest)</button>
+            <button class="tab" data-log="debug" type="button">Игра (debug)</button>
+            <button class="tab" data-log="activity" type="button">Активность</button>
+          </div>
+          <pre class="log-view" id="log-view">Загрузка…</pre>
+        </section>
+
+        <section class="view" id="view-sessions">
+          <h1 class="view-title">Сессии</h1>
+          <p class="view-desc">История запусков лаунчера на этом ПК.</p>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr><th>Начало</th><th>Конец</th><th>Ник</th><th>Итог</th><th>События</th></tr>
+              </thead>
+              <tbody id="sessions-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

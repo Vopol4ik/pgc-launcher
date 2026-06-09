@@ -11,6 +11,9 @@ launcher/resources/modpack.dat
 launcher/resources/.modpack-manifest-state.json
 launcher/resources/launcher-auth.json
 
+# Локальная копия клиента (не коммитить)
+client/
+
 # Кэши
 **/.gradle/
 **/build/tmp/

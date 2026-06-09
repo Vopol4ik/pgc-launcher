@@ -84,4 +84,4 @@ async function applyGameOptions(gameDir, modpackSource, overrides = {}) {
   return { fresh: true };
 }
 
-module.exports = { applyGameOptions, DEFAULTS, KEY_OVERRIDES };
+module.exports = { applyGameOptions };

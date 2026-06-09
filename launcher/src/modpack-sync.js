@@ -8,6 +8,7 @@ const config = require('./config');
 const { download, fetchJson } = require('./download');
 const { formatLaunchError } = require('./errors');
 const { isGithubConfigured, releaseDownloadUrl } = require('./github-updates');
+const { isTrustedUrl, filterTrustedUrls } = require('./trusted-urls');
 
 function statePath(gameDir) {
   return path.join(gameDir, '.gw-modpack-state.json');
@@ -50,12 +51,12 @@ function allowedClientModNames(manifest) {
 }
 
 function fileUrl(manifest, entry) {
-  if (entry.url) return entry.url;
+  if (entry.url && isTrustedUrl(entry.url)) return entry.url;
   if (config.content?.useGithubReleases && isGithubConfigured(config.github)) {
     return releaseDownloadUrl(config.github, entry.path);
   }
   const base = manifest.baseUrl || config.content?.filesBaseUrl;
-  if (!base) return null;
+  if (!base || !isTrustedUrl(base)) return null;
   const normalized = entry.path.replace(/\\/g, '/');
   return `${base.replace(/\/$/, '')}/${normalized.split('/').map(encodeURIComponent).join('/')}`;
 }
@@ -72,7 +73,7 @@ function downloadUrlsForEntry(manifest, entry) {
     // На GitHub часто лежит только mods__pgcclient-2.0.0.jar (тот же sha256).
     urls.push(releaseDownloadUrl(config.github, `mods/${config.clientModId}-2.0.0.jar`));
   }
-  return [...new Set(urls)];
+  return filterTrustedUrls(urls);
 }
 
 async function downloadEntryFile(urls, dest, onProgress) {

@@ -1,8 +1,9 @@
 'use strict';
 
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { spawn } = require('child_process');
 
 if (process.platform === 'win32') {
   app.commandLine.appendSwitch('force-high-performance-gpu');
@@ -15,20 +16,37 @@ const { applyLauncherCpuLimit } = require('./cpu-limit');
 const { applyDiscreteGpuToProcessEnv } = require('./gpu-env');
 const { fetchNews } = require('./news');
 const { fetchServerStatus } = require('./server-status');
-const { login, registerAccount, checkLoginExists, validateSession } = require('./launcher-auth');
-const { applyRememberPassword, sanitizeSettingsForRenderer } = require('./credentials-store');
+const { sanitizeSettingsForRenderer } = require('./credentials-store');
 const { checkForUpdates } = require('./modpack-sync');
+const {
+  detectConnectFailure,
+  detectGameErrors,
+  isErrorLogLine,
+  sendEncryptedLogReport
+} = require('./log-report');
+const {
+  appendSessionRecord,
+  appendActivity,
+  appendLauncherJournalLine
+} = require('./panel-store');
+const { isDevRuntime, findPanelExe } = require('./paths');
 
 let mainWindow = null;
 const launcher = new GameLauncher();
 
-const WINDOW_SIZE = { width: 1010, height: 635, logExtra: 235 };
-const LOG_ANIM_MS = 240;
+const WINDOW_SIZE = { width: 1010, height: 635 };
 const LOG_FLUSH_MS = 48;
 const MAX_CPU_PERCENT = config.java?.maxCpuPercent ?? 75;
 
 let logFlushTimer = null;
 const logPending = [];
+const launcherJournal = [];
+const sessionEvents = [];
+const MAX_JOURNAL_LINES = 600;
+let sessionStartedAt = new Date().toISOString();
+let quitReportInProgress = false;
+let quitReportDone = false;
+let sessionPersisted = false;
 
 function flushLogBuffer() {
   logFlushTimer = null;
@@ -37,37 +55,78 @@ function flushLogBuffer() {
   mainWindow.webContents.send('launcher:log-batch', batch);
 }
 
+function recordSessionEvent(type, detail) {
+  const entry = {
+    at: new Date().toISOString(),
+    type: String(type || 'event'),
+    detail: detail ? String(detail).slice(0, 500) : ''
+  };
+  sessionEvents.push(entry);
+  appendActivity({
+    type: entry.type,
+    detail: entry.detail
+  }).catch(() => {});
+}
+
+async function persistSessionRecord(outcome, detail) {
+  if (sessionPersisted) return;
+  sessionPersisted = true;
+  const settings = loadSettings();
+  await appendSessionRecord({
+    startedAt: sessionStartedAt,
+    endedAt: new Date().toISOString(),
+    username: settings.username || null,
+    outcome: outcome || 'closed',
+    detail: detail || '',
+    events: sessionEvents.slice(-40)
+  }).catch(() => {});
+}
+
 function queueLogLine(line) {
-  logPending.push(line);
+  const entries = Array.isArray(line) ? line : [line];
+  for (const entry of entries) {
+    const text = String(entry);
+    logPending.push(text);
+    launcherJournal.push(text);
+    if (launcherJournal.length > MAX_JOURNAL_LINES) launcherJournal.shift();
+    appendLauncherJournalLine(text).catch(() => {});
+    if (isErrorLogLine(text)) {
+      recordSessionEvent('game-log', text.slice(0, 240));
+    }
+  }
   if (!logFlushTimer) {
     logFlushTimer = setTimeout(flushLogBuffer, LOG_FLUSH_MS);
   }
 }
 
-function applyWindowHeight(height) {
-  if (!mainWindow) return;
-  mainWindow.setMinimumSize(WINDOW_SIZE.width, height);
-  mainWindow.setMaximumSize(WINDOW_SIZE.width, height);
-  mainWindow.setSize(WINDOW_SIZE.width, height, true);
+function reportLauncherError(reason, detail) {
+  recordSessionEvent(reason, detail);
 }
 
-function animateWindowHeight(targetHeight, durationMs = LOG_ANIM_MS) {
-  if (!mainWindow) return;
-  const startHeight = mainWindow.getSize()[1];
-  const delta = targetHeight - startHeight;
-  if (delta === 0) return;
+async function sendSessionLogOnQuit() {
+  if (quitReportDone || quitReportInProgress) return null;
+  const settings = loadSettings();
+  if (settings.autoReportLogs === false) return null;
+  if (!settings.discordWebhookUrl || !settings.logEncryptKey) return null;
 
-  const frames = 8;
-  const stepMs = Math.max(24, Math.floor(durationMs / frames));
-  let frame = 0;
-  const tick = () => {
-    frame += 1;
-    const t = Math.min(1, frame / frames);
-    const eased = 1 - (1 - t) ** 3;
-    applyWindowHeight(Math.round(startHeight + delta * eased));
-    if (t < 1) setTimeout(tick, stepMs);
-  };
-  tick();
+  quitReportInProgress = true;
+  try {
+    recordSessionEvent('launcher-quit', `session=${sessionStartedAt}`);
+    const result = await sendEncryptedLogReport({
+      gameDir: getGameDir(),
+      webhookUrl: settings.discordWebhookUrl,
+      encryptPassphrase: settings.logEncryptKey,
+      username: settings.username || 'unknown',
+      launcherVersion: config.appVersion,
+      reason: 'session-close',
+      launcherLines: launcherJournal,
+      sessionEvents
+    });
+    quitReportDone = true;
+    return result;
+  } finally {
+    quitReportInProgress = false;
+  }
 }
 
 function applyCpuLimitsToWindow() {
@@ -104,7 +163,7 @@ function createWindow() {
     minWidth: WINDOW_SIZE.width,
     maxWidth: WINDOW_SIZE.width,
     minHeight: WINDOW_SIZE.height,
-    maxHeight: WINDOW_SIZE.height + WINDOW_SIZE.logExtra,
+    maxHeight: WINDOW_SIZE.height,
     resizable: false,
     frame: false,
     transparent: true,
@@ -120,27 +179,62 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+  mainWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  mainWindow.webContents.on('will-navigate', (event) => {
+    event.preventDefault();
+  });
   mainWindow.webContents.on('did-finish-load', applyCpuLimitsToWindow);
 
-  // Проброс событий лаунчера в окно.
   launcher.on('status', (s) => mainWindow?.webContents.send('launcher:status', s));
   launcher.on('log', (m) => queueLogLine(m));
-  launcher.on('launched', () => mainWindow?.webContents.send('launcher:launched'));
-  launcher.on('game-close', (code) => mainWindow?.webContents.send('launcher:game-close', code));
+  launcher.on('launched', () => {
+    recordSessionEvent('game-launched');
+    mainWindow?.webContents.send('launcher:launched');
+  });
+  launcher.on('game-close', (code) => {
+    mainWindow?.webContents.send('launcher:game-close', code);
+    const gameDir = getGameDir();
+    const detail = code != null && code !== 0 ? `exit=${code}` : 'game-closed';
+    if (detectConnectFailure(gameDir)) {
+      recordSessionEvent('connect-fail', detail);
+    } else if (detectGameErrors(gameDir)) {
+      recordSessionEvent('game-errors', detail);
+    } else {
+      recordSessionEvent('game-close', detail);
+    }
+  });
 }
 
 app.whenReady().then(() => {
+  recordSessionEvent('launcher-start', sessionStartedAt);
   applyDiscreteGpuToProcessEnv();
   applyLauncherCpuLimit(MAX_CPU_PERCENT, process.pid);
   createWindow();
   mainWindow.webContents.once('did-finish-load', () => {
     launcher.startBackgroundUpdateLoop();
-    launcher.syncModpackOnStartup().catch(() => {});
+    launcher.syncModpackOnStartup().catch((err) => {
+      reportLauncherError('modpack-startup-error', formatLaunchError(err));
+    });
   });
 });
 
-app.on('before-quit', () => {
+app.on('before-quit', (event) => {
   launcher.stopBackgroundUpdateLoop();
+  persistSessionRecord('launcher-quit');
+  if (quitReportDone || quitReportInProgress) return;
+
+  const settings = loadSettings();
+  if (settings.autoReportLogs === false || !settings.discordWebhookUrl || !settings.logEncryptKey) {
+    return;
+  }
+
+  event.preventDefault();
+  sendSessionLogOnQuit()
+    .catch(() => {})
+    .finally(() => {
+      quitReportDone = true;
+      app.quit();
+    });
 });
 
 app.on('window-all-closed', () => {
@@ -190,10 +284,6 @@ ipcMain.handle('server:status', async () => {
 
 ipcMain.handle('app:info', async () => {
   const saved = loadSettings();
-  let auth = { ok: false, login: null };
-  if (saved.authSession) {
-    auth = await validateSession(getGameDir(), saved.authSession);
-  }
   const settings = sanitizeSettingsForRenderer({ ...config.launcherDefaults, ...saved });
   return {
     brand: config.brand,
@@ -203,92 +293,48 @@ ipcMain.handle('app:info', async () => {
     javaMajor: config.java?.major ?? 17,
     defaults: config.launcherDefaults,
     memoryOptions: [2048, 4096, 6144, 8192, 10240, 12288, 16384, 20480, 24576, 28672],
-    settings,
-    auth: auth.ok ? { ok: true, login: auth.login } : { ok: false, login: null }
+    settings
   };
 });
 
 ipcMain.handle('settings:save', (_e, data) => {
   const current = loadSettings();
-  const merged = applyRememberPassword({ ...current, ...data }, data);
-  if ('password' in merged) delete merged.password;
-  if ('savedPassword' in merged) delete merged.savedPassword;
+  const merged = { ...current, ...data };
+  if (!String(data.discordWebhookUrl || '').trim() && current.discordWebhookUrl) {
+    merged.discordWebhookUrl = current.discordWebhookUrl;
+  }
+  if (!String(data.logEncryptKey || '').trim() && current.logEncryptKey) {
+    merged.logEncryptKey = current.logEncryptKey;
+  }
+  delete merged.password;
+  delete merged.savedPassword;
+  delete merged.savedPasswordEnc;
+  delete merged.rememberPassword;
+  delete merged.authSession;
   saveSettings(merged);
   return sanitizeSettingsForRenderer(merged);
 });
 
-function persistAuthSession(login, session, password, rememberPassword) {
-  const current = loadSettings();
-  const merged = applyRememberPassword({
-    ...current,
-    username: login,
-    authSession: session,
-    rememberPassword: rememberPassword !== false
-  }, {
-    rememberPassword: rememberPassword !== false,
-    savedPassword: rememberPassword !== false ? password : ''
-  });
-  if ('savedPassword' in merged) delete merged.savedPassword;
-  saveSettings(merged);
-}
-
-ipcMain.handle('auth:check', async (_e, payload) => {
+ipcMain.handle('logs:report', async (_e, payload) => {
   try {
-    const username = String(payload?.username || '').trim();
-    return await checkLoginExists(getGameDir(), username);
-  } catch (err) {
-    return { ok: false, exists: false, error: formatLaunchError(err) };
-  }
-});
-
-ipcMain.handle('auth:register', async (_e, payload) => {
-  try {
-    const username = String(payload?.username || '').trim();
-    const password = String(payload?.password || '');
-    const confirmPassword = String(payload?.confirmPassword || '');
-    const result = await registerAccount(getGameDir(), username, password, confirmPassword);
-    if (!result.ok) return result;
-
-    persistAuthSession(
-      result.login,
-      result.session,
-      password,
-      payload?.rememberPassword !== false
-    );
-    return { ok: true, login: result.login };
-  } catch (err) {
-    return { ok: false, error: formatLaunchError(err) };
-  }
-});
-
-ipcMain.handle('auth:login', async (_e, payload) => {
-  try {
-    const username = String(payload?.username || '').trim();
-    const password = String(payload?.password || '');
-    if (!username || !password) {
-      return { ok: false, error: 'Введите ник и пароль.' };
+    const settings = loadSettings();
+    if (!settings.discordWebhookUrl || !settings.logEncryptKey) {
+      return { ok: false, error: 'В настройках укажите Discord webhook и ключ шифрования.' };
     }
-    const result = await login(getGameDir(), username, password);
-    if (!result.ok) return result;
-
-    persistAuthSession(
-      result.login,
-      result.session,
-      password,
-      payload?.rememberPassword !== false
-    );
-    return { ok: true, login: result.login };
+    const result = await sendEncryptedLogReport({
+      gameDir: getGameDir(),
+      webhookUrl: settings.discordWebhookUrl,
+      encryptPassphrase: settings.logEncryptKey,
+      username: settings.username || payload?.username || 'unknown',
+      launcherVersion: config.appVersion,
+      reason: payload?.reason || 'manual',
+      launcherLines: launcherJournal,
+      sessionEvents
+    });
+    return { ok: true, filename: result.filename };
   } catch (err) {
     return { ok: false, error: formatLaunchError(err) };
   }
-});
-
-ipcMain.handle('auth:logout', () => {
-  const current = loadSettings();
-  const next = { ...current };
-  delete next.authSession;
-  saveSettings(next);
-  return { ok: true };
 });
 
 ipcMain.handle('game:launch', async (_e, username) => {
@@ -302,49 +348,34 @@ ipcMain.handle('game:launch', async (_e, username) => {
     await launcher.launch(nick);
     return { ok: true };
   } catch (err) {
-    return { ok: false, error: formatLaunchError(err) };
+    const msg = formatLaunchError(err);
+    reportLauncherError('launch-error', msg);
+    return { ok: false, error: msg };
   }
 });
 
-ipcMain.handle('update:check', async () => {
-  try {
-    return { ok: true, ...(await launcher.checkModpackUpdates()) };
-  } catch (err) {
-    return { ok: false, error: formatLaunchError(err), available: false };
+function launchPanelApp() {
+  const panelExe = findPanelExe();
+  if (panelExe) {
+    return shell.openPath(panelExe).then((err) => (err ? { ok: false, error: err } : { ok: true }));
   }
-});
+  if (isDevRuntime()) {
+    const panelMain = path.join(__dirname, 'panel-app-main.js');
+    spawn(process.execPath, [panelMain], {
+      cwd: path.join(__dirname, '..'),
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: true
+    }).unref();
+    return Promise.resolve({ ok: true });
+  }
+  return Promise.resolve({
+    ok: false,
+    error: 'PGC Panel не найден. Соберите: npm run dist:panel'
+  });
+}
 
-ipcMain.handle('modpack:sync', async () => {
-  if (launcher.gameRunning) {
-    return { ok: false, error: 'Закройте игру перед обновлением.' };
-  }
-  try {
-    await launcher.syncModpackOnStartup();
-    return { ok: true };
-  } catch (err) {
-    return { ok: false, error: formatLaunchError(err) };
-  }
-});
-
-ipcMain.handle('update:apply', async () => {
-  if (launcher.gameRunning) {
-    return { ok: false, error: 'Закройте игру перед обновлением.' };
-  }
-  try {
-    const result = await launcher.applyModpackUpdates();
-    return { ok: true, ...result };
-  } catch (err) {
-    return { ok: false, error: formatLaunchError(err) };
-  }
-});
+ipcMain.handle('panel:open', () => launchPanelApp());
 
 ipcMain.on('window:minimize', () => mainWindow?.minimize());
 ipcMain.on('window:close', () => mainWindow?.close());
-
-ipcMain.on('window:log-panel', (_e, payload) => {
-  const open = typeof payload === 'boolean' ? payload : Boolean(payload?.open);
-  const animate = typeof payload === 'boolean' ? true : payload?.animate !== false;
-  const target = open ? WINDOW_SIZE.height + WINDOW_SIZE.logExtra : WINDOW_SIZE.height;
-  if (animate) animateWindowHeight(target, LOG_ANIM_MS);
-  else applyWindowHeight(target);
-});

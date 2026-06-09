@@ -6,10 +6,12 @@ const path = require('path');
 const config = require('./config');
 const { fetchJson } = require('./download');
 const { isGithubConfigured, rawFileUrl } = require('./github-updates');
+const { assertTrustedUrl } = require('./trusted-urls');
 
 function fetchGithubNews(github) {
   const branch = github.branch || 'main';
   const url = `https://api.github.com/repos/${github.owner}/${github.repo}/contents/news.json?ref=${encodeURIComponent(branch)}`;
+  assertTrustedUrl(url);
   return new Promise((resolve, reject) => {
     https.get(url, {
       headers: {
@@ -115,4 +117,4 @@ async function fetchNews() {
   };
 }
 
-module.exports = { fetchNews, resolveBundledNews, mergeNewsItems };
+module.exports = { fetchNews };

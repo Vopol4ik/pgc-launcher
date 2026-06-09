@@ -1,73 +1,39 @@
 'use strict';
 
-const { safeStorage } = require('electron');
-
-function encodePassword(password) {
-  const value = String(password || '');
-  if (!value) return null;
-  if (safeStorage.isEncryptionAvailable()) {
-    return {
-      v: 2,
-      data: safeStorage.encryptString(value).toString('base64')
-    };
-  }
-  return {
-    v: 1,
-    data: Buffer.from(value, 'utf8').toString('base64')
-  };
-}
-
-function decodePassword(stored) {
-  if (!stored?.data) return '';
+function maskWebhook(url) {
+  const value = String(url || '').trim();
+  if (!value) return '';
   try {
-    if (stored.v === 2 && safeStorage.isEncryptionAvailable()) {
-      return safeStorage.decryptString(Buffer.from(stored.data, 'base64'));
-    }
-    return Buffer.from(stored.data, 'base64').toString('utf8');
+    const u = new URL(value);
+    const parts = u.pathname.split('/');
+    const token = parts.pop() || '';
+    if (token.length <= 8) return `${u.origin}${parts.join('/')}/***`;
+    return `${u.origin}${parts.join('/')}/${token.slice(0, 4)}…${token.slice(-4)}`;
   } catch {
-    return '';
+    return '***';
   }
 }
 
-function applyRememberPassword(settings, payload = {}) {
-  const next = { ...settings };
-  const remember = payload.rememberPassword ?? next.rememberPassword;
-
-  if (remember === false) {
-    delete next.savedPasswordEnc;
-    next.rememberPassword = false;
-    return next;
-  }
-
-  if (payload.rememberPassword === true || remember === true) {
-    next.rememberPassword = true;
-  }
-
-  if (payload.savedPassword != null && String(payload.savedPassword).length > 0) {
-    next.savedPasswordEnc = encodePassword(payload.savedPassword);
-  }
-
-  return next;
-}
-
-function readSavedPassword(settings) {
-  if (!settings?.rememberPassword) return '';
-  return decodePassword(settings.savedPasswordEnc);
-}
-
+/** Убирает чувствительные поля из настроек перед отправкой в renderer. */
 function sanitizeSettingsForRenderer(settings) {
   const copy = { ...settings };
   delete copy.savedPasswordEnc;
-  if (copy.rememberPassword) {
-    copy.savedPassword = readSavedPassword(settings);
+  delete copy.savedPassword;
+  delete copy.password;
+  delete copy.rememberPassword;
+  delete copy.authSession;
+
+  copy.logEncryptKeyConfigured = Boolean(String(settings?.logEncryptKey || '').length >= 8);
+  delete copy.logEncryptKey;
+
+  if (copy.discordWebhookUrl) {
+    copy.discordWebhookConfigured = true;
+    copy.discordWebhookUrl = maskWebhook(copy.discordWebhookUrl);
   } else {
-    copy.savedPassword = '';
+    copy.discordWebhookConfigured = false;
   }
+
   return copy;
 }
 
-module.exports = {
-  applyRememberPassword,
-  readSavedPassword,
-  sanitizeSettingsForRenderer
-};
+module.exports = { sanitizeSettingsForRenderer };

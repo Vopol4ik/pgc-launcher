@@ -55,7 +55,6 @@ function resolveContentUrls(github, legacy) {
 }
 
 module.exports = {
-  releaseAssetName,
   isGithubConfigured,
   rawFileUrl,
   releaseDownloadUrl,

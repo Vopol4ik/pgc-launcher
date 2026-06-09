@@ -7,6 +7,9 @@
   "main": "src/main.js",
   "scripts": {
     "start": "electron .",
+    "start:panel": "electron src/panel-app-main.js",
+    "dist:panel": "npm run sync-version && electron-builder --win --x64 --config electron-builder.panel.json",
+    "dist:all": "npm run dist && npm run dist:panel",
     "assets": "node scripts/gen-assets.js",
     "sync-version": "node ../scripts/sync-version.js",
     "predist": "npm run sync-version && node scripts/gen-assets.js && node scripts/ensure-content-meta.js",
@@ -66,6 +69,13 @@
       {
         "from": "resources/news.json",
         "to": "news.json"
+      },
+      {
+        "from": "resources/panel",
+        "to": "panel",
+        "filter": [
+          "**/*"
+        ]
       },
       {
         "from": "../version.json",

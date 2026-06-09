@@ -8,7 +8,6 @@ const fsp = require('fs/promises');
 const os = require('os');
 const crypto = require('crypto');
 const { download } = require('./download');
-const { spawnSync } = require('child_process');
 
 const config = require('./config');
 const { getGameDir } = require('./paths');
@@ -52,62 +51,6 @@ function buildOfflineAuth(username) {
     user_properties: '{}',
     meta: { type: 'mojang', demo: false }
   };
-}
-
-// Проверка мажорной версии Java по пути к java.exe.
-function javaMajorVersion(javaExe) {
-  try {
-    const res = spawnSync(javaExe, ['-version'], { encoding: 'utf8' });
-    const out = `${res.stderr || ''}${res.stdout || ''}`;
-    const m = out.match(/version "(\d+)(?:\.(\d+))?/);
-    if (!m) return null;
-    let major = parseInt(m[1], 10);
-    if (major === 1 && m[2]) major = parseInt(m[2], 10); // старый формат 1.8
-    return major;
-  } catch {
-    return null;
-  }
-}
-
-// Поиск подходящей Java (17+) для Forge 1.20.1, предпочтительно 17 или 21.
-function findJava() {
-  const candidates = [];
-  if (process.env.JAVA_HOME) {
-    candidates.push(path.join(process.env.JAVA_HOME, 'bin', 'java.exe'));
-  }
-  const programFiles = [
-    process.env['ProgramFiles'],
-    process.env['ProgramFiles(x86)'],
-    process.env['ProgramW6432']
-  ].filter(Boolean);
-  const vendors = ['Java', 'Eclipse Adoptium', 'Microsoft', 'Zulu', 'AdoptOpenJDK', 'Amazon Corretto'];
-  for (const pf of programFiles) {
-    for (const vendor of vendors) {
-      const dir = path.join(pf, vendor);
-      try {
-        for (const entry of fs.readdirSync(dir)) {
-          candidates.push(path.join(dir, entry, 'bin', 'java.exe'));
-        }
-      } catch {
-        // каталога нет — пропускаем
-      }
-    }
-  }
-  candidates.push('java'); // последний шанс — PATH
-
-  const valid = [];
-  for (const c of candidates) {
-    if (c !== 'java' && !fs.existsSync(c)) continue;
-    const major = javaMajorVersion(c);
-    if (major && major >= 17) valid.push({ path: c, major });
-  }
-  if (valid.length === 0) return null;
-  // Для Forge 1.20.1 предпочитаем Java 17 (самая совместимая), затем 21.
-  valid.sort((a, b) => {
-    const score = (v) => (v === 17 ? 0 : v === 21 ? 1 : 2 + Math.abs(v - 18));
-    return score(a.major) - score(b.major);
-  });
-  return valid[0].path;
 }
 
 // Проверка, что jar — валидный zip-архив Forge-установщика.
@@ -305,7 +248,9 @@ class GameLauncher extends EventEmitter {
         lower.includes('beyondhorizons') ||
         lower.includes('bh_iv') ||
         lower.includes('cameraoverhaul') ||
-        lower.includes('distanthorizons') ||
+        lower.includes('tl_skin') ||
+        lower.includes('tlskincape') ||
+        lower.includes('tlauncher') ||
         (lower.startsWith('ecf-') && lower.endsWith('.jar')) ||
         lower.includes('wrecked') ||
         lower.includes('mcsp-1.20.1') ||
@@ -431,20 +376,6 @@ class GameLauncher extends EventEmitter {
     }
   }
 
-  async checkModpackUpdates() {
-    return checkForUpdates(this.gameDir);
-  }
-
-  async applyModpackUpdates() {
-    const result = await applyUpdates(
-      this.gameDir,
-      null,
-      (t, p) => this.status(t, p)
-    );
-    await this.stripBlockedMods(path.join(this.gameDir, 'mods'));
-    return result;
-  }
-
   forgeInstallerUrl() {
     const { version, forgeVersion } = config.minecraft;
     const id = `${version}-${forgeVersion}`;
@@ -501,10 +432,11 @@ class GameLauncher extends EventEmitter {
 
   resolveMemory() {
     const s = this.loadLauncherSettings();
+    const cap = Number(config.memory?.maxCap) || 16384;
     const min = Number(s.memoryMin) || config.memory.min;
-    const max = Number(s.memoryMax) || config.memory.max;
+    const max = Math.min(Number(s.memoryMax) || config.memory.max, cap);
     const safeMin = Math.min(min, max);
-    const safeMax = Math.max(min, max);
+    const safeMax = Math.max(safeMin, max);
     return { max: `${safeMax}M`, min: `${safeMin}M` };
   }
 
@@ -589,4 +521,4 @@ class GameLauncher extends EventEmitter {
   }
 }
 
-module.exports = { GameLauncher, getGameDir, offlineUUID, findJava };
+module.exports = { GameLauncher, getGameDir };

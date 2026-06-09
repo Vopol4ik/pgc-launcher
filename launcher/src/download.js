@@ -3,6 +3,7 @@
 const fs = require('fs');
 const https = require('https');
 const config = require('./config');
+const { assertDownloadUrl, assertTrustedUrl } = require('./trusted-urls');
 
 const downloadAgent = new https.Agent({
   keepAlive: true,
@@ -13,6 +14,11 @@ function download(url, dest, onProgress, redirects = 0) {
   return new Promise((resolve, reject) => {
     if (redirects > 6) {
       return reject(new Error('Слишком много перенаправлений при загрузке'));
+    }
+    try {
+      assertDownloadUrl(url, { redirect: redirects > 0 });
+    } catch (err) {
+      return reject(err);
     }
     const req = https.get(url, {
       agent: downloadAgent,
@@ -70,10 +76,15 @@ function download(url, dest, onProgress, redirects = 0) {
   });
 }
 
-function fetchJson(url, redirects = 0) {
+function fetchJson(url, redirects = 0, options = {}) {
   return new Promise((resolve, reject) => {
     if (redirects > 6) {
       return reject(new Error('Слишком много перенаправлений при запросе API'));
+    }
+    try {
+      assertTrustedUrl(url, options);
+    } catch (err) {
+      return reject(err);
     }
     https.get(url, {
       agent: downloadAgent,
@@ -85,7 +96,7 @@ function fetchJson(url, redirects = 0) {
       if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
         res.resume();
         const next = new URL(res.headers.location, url).toString();
-        return resolve(fetchJson(next, redirects + 1));
+        return resolve(fetchJson(next, redirects + 1, options));
       }
       if (res.statusCode !== 200) {
         res.resume();

@@ -1,0 +1,51 @@
+{
+  "appId": "io.pgc.panel",
+  "productName": "PGC Panel",
+  "main": "src/panel-app-main.js",
+  "asar": true,
+  "compression": "normal",
+  "electronLanguages": ["ru", "en-US"],
+  "directories": {
+    "output": "release"
+  },
+  "files": [
+    "src/**/*",
+    "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
+    "!**/node_modules/*/{test,__tests__,tests,powered-test,example,examples}"
+  ],
+  "extraResources": [
+    {
+      "from": "resources/panel",
+      "to": "panel",
+      "filter": ["**/*"]
+    },
+    {
+      "from": "../version.json",
+      "to": "version.json"
+    }
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "build/icon.ico",
+    "artifactName": "PGC Panel Setup ${version}.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "PGC Panel",
+    "uninstallDisplayName": "PGC Panel",
+    "installerIcon": "build/icon.ico",
+    "uninstallerIcon": "build/icon.ico",
+    "installerHeaderIcon": "build/icon.ico",
+    "installerHeader": "build/installerHeader.bmp",
+    "installerSidebar": "build/installerSidebar.bmp"
+  }
+}

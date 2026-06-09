@@ -9,6 +9,7 @@ const { extract7z } = require('./archive-7z');
 const { download } = require('./download');
 const config = require('./config');
 const { isGithubConfigured, releaseContent7zUrl } = require('./github-updates');
+const { filterTrustedUrls } = require('./trusted-urls');
 
 function expectedLauncherVersion(meta) {
   return meta?.launcherVersion || null;
@@ -39,8 +40,7 @@ function contentDownloadUrls(meta) {
   if (meta?.url) urls.push(meta.url);
   const gh = releaseContent7zUrl(config.github);
   if (gh) urls.unshift(gh);
-  if (config.content?.downloadUrl) urls.push(config.content.downloadUrl);
-  return [...new Set(urls.filter(Boolean))];
+  return filterTrustedUrls(urls);
 }
 
 function contentCacheMetaPath() {

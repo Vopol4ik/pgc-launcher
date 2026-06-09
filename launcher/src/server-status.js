@@ -163,7 +163,11 @@ async function resolveServerTarget() {
 }
 
 async function fetchMcsrvstat(host) {
-  const meta = await fetchJson(`https://api.mcsrvstat.us/3/${encodeURIComponent(host)}`);
+  const meta = await fetchJson(
+    `https://api.mcsrvstat.us/3/${encodeURIComponent(host)}`,
+    0,
+    { allowMcsrvstat: true }
+  );
   const target = meta?.port
     ? { host: meta.ip || host, port: meta.port, virtualHost: host }
     : null;

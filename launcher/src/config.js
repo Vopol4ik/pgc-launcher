@@ -42,9 +42,9 @@ const github = {
 };
 
 const contentLegacy = {
-  downloadUrl: 'https://operativniki.minerent.io/launcher/content.7z',
-  manifestUrl: 'https://operativniki.minerent.io/launcher/modpack-manifest.json',
-  filesBaseUrl: 'https://operativniki.minerent.io/launcher/files/'
+  downloadUrl: null,
+  manifestUrl: null,
+  filesBaseUrl: null
 };
 
 const contentUrls = resolveContentUrls(github, contentLegacy);
@@ -99,13 +99,29 @@ module.exports = {
   // Память JVM (в мегабайтах), значения по умолчанию в настройках лаунчера
   memory: {
     min: 2048,
-    max: 28672
+    max: 28672,
+    maxCap: 16384
+  },
+
+  logReport: {
+    maxLogBytes: 1_500_000,
+    autoOnQuit: true
+  },
+
+  /** Локальная веб-панель (только 127.0.0.1 на этом ПК). */
+  panel: {
+    host: '127.0.0.1',
+    port: 17890
   },
 
   launcherDefaults: {
     memoryMin: 4096,
     memoryMax: 12288,
-    fullscreen: false
+    fullscreen: false,
+    uiFont: 'default',
+    discordWebhookUrl: '',
+    logEncryptKey: '',
+    autoReportLogs: true
   },
 
   // Где лежит твоя сборка модов (mods/, config/, ...).
@@ -113,9 +129,9 @@ module.exports = {
   // Можно указать абсолютный путь, например: 'C:/Users/Intel/Desktop/SVO_mods'
   modpackSource: null,
 
-  /** Сборка modpack (content.7z) — не в установщике, качается при первом запуске. */
+  /** Сборка modpack (content.7z) — только GitHub Releases (см. trusted-urls.js). */
   content: {
-    downloadUrl: contentLegacy.downloadUrl,
+    downloadUrl: null,
     manifestUrl: contentUrls.manifestUrl,
     filesBaseUrl: contentUrls.filesBaseUrl,
     useGithubReleases: contentUrls.useGithubReleases,
@@ -134,6 +150,7 @@ module.exports = {
     '-XX:+ParallelRefProcEnabled',
     '-XX:MaxMetaspaceSize=512M',
     '-XX:+DisableExplicitGC',
-    '-Djava.net.preferIPv4Stack=true'
+    '-Djava.net.preferIPv4Stack=true',
+    '-Dorg.lwjgl.system.allocator=system'
   ]
 };

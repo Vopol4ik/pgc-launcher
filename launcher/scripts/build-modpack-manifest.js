@@ -22,10 +22,3 @@ if (fs.existsSync(newsSrc)) {
   fs.copyFileSync(newsSrc, newsDest);
   console.log('news.json скопирован из github-updates');
 }
-
-const authSrc = path.join(root, '..', 'github-updates', 'launcher-auth.json');
-const authDest = path.join(root, 'resources', 'launcher-auth.json');
-if (fs.existsSync(authSrc)) {
-  fs.copyFileSync(authSrc, authDest);
-  console.log('launcher-auth.json скопирован из github-updates');
-}

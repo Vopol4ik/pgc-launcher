@@ -11,7 +11,6 @@ const statusText = $('status-text');
 const progressFill = $('progress-fill');
 const logEl = $('log');
 const logPanel = $('log-panel');
-const contentRoot = $('content-root');
 const logToggle = $('log-toggle');
 const logClose = $('log-close');
 const logClear = $('log-clear');
@@ -21,7 +20,17 @@ const settingsClose = $('settings-close');
 const settingsSave = $('settings-save');
 const memoryMin = $('memory-min');
 const memoryMax = $('memory-max');
+const uiFontSelect = $('ui-font');
 const fullscreenCb = $('fullscreen');
+const panelBtn = $('panel-btn');
+
+const UI_FONTS = [
+  { id: 'default', label: 'Segoe UI (по умолчанию)', stack: '"Segoe UI", system-ui, sans-serif' },
+  { id: 'system', label: 'Системный', stack: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' },
+  { id: 'arial', label: 'Arial', stack: '"Arial", "Helvetica Neue", Helvetica, sans-serif' },
+  { id: 'tahoma', label: 'Tahoma', stack: '"Tahoma", "Segoe UI", sans-serif' },
+  { id: 'georgia', label: 'Georgia', stack: '"Georgia", "Times New Roman", serif' }
+];
 
 const NICK_RE = /^[A-Za-z0-9_]{3,16}$/;
 const LOG_CLOSE_MS = 260;
@@ -388,6 +397,10 @@ async function init() {
   fillMemorySelect(memoryMax, memoryOptions);
   memoryMin.value = String(appInfo.settings.memoryMin || appInfo.defaults.memoryMin);
   memoryMax.value = String(appInfo.settings.memoryMax || appInfo.defaults.memoryMax);
+  fillFontSelect(uiFontSelect);
+  const uiFont = appInfo.settings.uiFont || appInfo.defaults.uiFont || 'default';
+  uiFontSelect.value = UI_FONTS.some((f) => f.id === uiFont) ? uiFont : 'default';
+  applyUiFont(uiFontSelect.value);
   fullscreenCb.checked = Boolean(appInfo.settings.fullscreen);
 
   validateNick();
@@ -405,6 +418,26 @@ function fillMemorySelect(select, values) {
     opt.textContent = `${mb} МБ (${(mb / 1024).toFixed(1)} ГБ)`;
     select.appendChild(opt);
   }
+}
+
+function fillFontSelect(select) {
+  select.innerHTML = '';
+  for (const font of UI_FONTS) {
+    const opt = document.createElement('option');
+    opt.value = font.id;
+    opt.textContent = font.label;
+    opt.style.fontFamily = font.stack;
+    select.appendChild(opt);
+  }
+}
+
+function resolveUiFontStack(fontId) {
+  const found = UI_FONTS.find((f) => f.id === fontId);
+  return found?.stack || UI_FONTS[0].stack;
+}
+
+function applyUiFont(fontId) {
+  document.documentElement.style.setProperty('--ui-font', resolveUiFontStack(fontId));
 }
 
 function openSettings() {
@@ -427,14 +460,21 @@ settingsSave.addEventListener('click', async () => {
   let min = Number(memoryMin.value);
   let max = Number(memoryMax.value);
   if (min > max) [min, max] = [max, min];
-  await window.svo.saveSettings({
+  const uiFont = UI_FONTS.some((f) => f.id === uiFontSelect.value) ? uiFontSelect.value : 'default';
+  const saved = await window.svo.saveSettings({
     memoryMin: min,
     memoryMax: max,
-    fullscreen: fullscreenCb.checked
+    fullscreen: fullscreenCb.checked,
+    uiFont
   });
-  appInfo = { ...appInfo, settings: { ...appInfo.settings, memoryMin: min, memoryMax: max, fullscreen: fullscreenCb.checked } };
+  applyUiFont(uiFont);
+  appInfo = { ...appInfo, settings: { ...appInfo.settings, ...saved } };
   closeSettings();
   setStatus('Настройки сохранены', 0);
+});
+
+uiFontSelect.addEventListener('change', () => {
+  applyUiFont(uiFontSelect.value);
 });
 
 playBtn.addEventListener('click', async () => {
@@ -510,6 +550,14 @@ function toggleLog() {
   if (isLogOpen()) closeLog();
   else openLog();
 }
+
+panelBtn?.addEventListener('click', async () => {
+  const result = await window.svo.openPanel();
+  if (!result.ok) {
+    setStatus(result.error || 'Не удалось открыть панель', 0);
+    setLogOpen(true);
+  }
+});
 
 logToggle.addEventListener('click', toggleLog);
 logClose.addEventListener('click', () => setLogOpen(false));
