@@ -364,7 +364,9 @@ class GameLauncher extends EventEmitter {
     this.syncInProgress = true;
     try {
       await fsp.mkdir(this.gameDir, { recursive: true });
-      await this.ensureModpackBaseline({ quiet });
+      if (await this.modsNeedInstall()) {
+        return { ok: true, skipped: true, firstInstall: true };
+      }
 
       const resolved = await resolveManifest();
       if (!quiet && resolved.source !== 'remote') {
@@ -389,11 +391,8 @@ class GameLauncher extends EventEmitter {
   }
 
   async syncModpack() {
-    const needMods = await this.modsNeedInstall();
-    if (needMods) {
-      this.status('Подготовка сборки…');
-      await this.extractEmbeddedModpack();
-      await this.refreshModpackStateFromManifest();
+    if (await this.modsNeedInstall()) {
+      await this.ensureModpackBaseline({ quiet: false });
     } else {
       this.log('Модпак уже установлен — загрузка и распаковка пропущены.');
       await this.stripBlockedMods(path.join(this.gameDir, 'mods'));
