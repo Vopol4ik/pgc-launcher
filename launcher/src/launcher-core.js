@@ -329,8 +329,15 @@ class GameLauncher extends EventEmitter {
     try {
       await fsp.mkdir(this.gameDir, { recursive: true });
       if (await this.modsNeedInstall()) {
-        if (!quiet) this.log('Первая установка — полное обновление при запуске игры.');
-        return { ok: true, skipped: true };
+        if (!quiet) {
+          this.log('Первая установка — нажмите «Играть» для загрузки сборки с GitHub.');
+          this.status('Нажмите «Играть» — загрузка сборки (~1.7 ГБ)', 0);
+        }
+        return { ok: true, skipped: true, firstInstall: true };
+      }
+      const resolved = await resolveManifest();
+      if (!quiet && resolved.source !== 'remote') {
+        this.log(`Манифест: ${resolved.source === 'bundled' ? 'локальная копия (GitHub недоступен)' : 'не найден'}.`);
       }
       await this.autoApplyModpackUpdates({ quiet });
       const client = await ensureClientModJar(this.gameDir, null);
@@ -351,10 +358,20 @@ class GameLauncher extends EventEmitter {
     if (needMods) {
       this.status('Подготовка сборки…');
       await this.extractEmbeddedModpack();
-      const bundled = resolveBundledManifest();
-      if (bundled) {
-        await refreshStateFromDisk(this.gameDir, bundled);
-        this.log(`Манифест сборки: ревизия ${bundled.revision}.`);
+      let manifest = null;
+      try {
+        const resolved = await resolveManifest();
+        manifest = resolved.manifest;
+        if (resolved.source === 'remote') {
+          this.log(`Манифест с GitHub: ревизия ${manifest?.revision ?? '?'}.`);
+        }
+      } catch {
+        manifest = null;
+      }
+      if (!manifest) manifest = resolveBundledManifest();
+      if (manifest) {
+        await refreshStateFromDisk(this.gameDir, manifest);
+        this.log(`Состояние сборки: рев. ${manifest.revision}.`);
       }
     } else {
       this.log('Модпак уже установлен — загрузка и распаковка пропущены.');

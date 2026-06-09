@@ -50,6 +50,9 @@ function isTrustedUrl(urlString, { allowMcsrvstat = false, allowGithubAssets = f
   if (host === 'api.github.com') {
     return path.toLowerCase().startsWith(`/repos/${gh.owner}/${gh.repo}/`);
   }
+  if (host === 'operativniki.minerent.io' && path.startsWith('/launcher/')) {
+    return true;
+  }
   return false;
 }
 
