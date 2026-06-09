@@ -226,7 +226,6 @@ html, body {
   font-weight: 700;
   color: #fff;
   text-transform: uppercase;
-  margin-top: 1px;
   cursor: pointer;
   overflow: hidden;
   transition: box-shadow 0.15s ease, opacity 0.15s ease;
@@ -1284,11 +1283,16 @@ html, body {
 .settings-save { margin-top: calc(14px * var(--ui-scale)); height: calc(46px * var(--ui-scale)); font-size: calc(15px * var(--ui-scale)); }
 
 .profile-nick-display {
-  font-size: 14px;
+  font-size: calc(13px * var(--ui-scale));
   font-weight: 600;
   color: var(--text);
   letter-spacing: 0.3px;
-  padding: 8px 0 2px;
+  padding: 0;
+  margin: 0;
+  line-height: calc(32px * var(--ui-scale));
+  height: calc(32px * var(--ui-scale));
+  display: flex;
+  align-items: center;
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
