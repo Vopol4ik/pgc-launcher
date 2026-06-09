@@ -23,6 +23,23 @@ function pathMatchesRepo(pathname, gh) {
   return String(pathname || '').toLowerCase().startsWith(prefix);
 }
 
+function isAdoptiumApiHost(host) {
+  return host === 'api.adoptium.net';
+}
+
+function isAdoptiumGithubUrl(urlString) {
+  try {
+    const url = new URL(String(urlString || ''));
+    const host = url.hostname.toLowerCase();
+    if (host === 'github.com') {
+      return url.pathname.toLowerCase().startsWith('/adoptium/');
+    }
+    return isGithubAssetRedirect(urlString);
+  } catch {
+    return false;
+  }
+}
+
 function isTrustedUrl(urlString, { allowMcsrvstat = false, allowGithubAssets = false } = {}) {
   let url;
   try {
@@ -34,14 +51,18 @@ function isTrustedUrl(urlString, { allowMcsrvstat = false, allowGithubAssets = f
   if (url.protocol !== 'https:') return false;
 
   const host = url.hostname.toLowerCase();
+  const path = url.pathname;
+
+  if (isAdoptiumApiHost(host)) return true;
+  if (host === 'operativniki.minerent.io' && path.startsWith('/launcher/')) return true;
   if (allowMcsrvstat && host === 'api.mcsrvstat.us') return true;
   if (allowGithubAssets && isGithubAssetRedirect(urlString)) return true;
 
   const gh = githubPaths();
   if (!gh) return false;
 
-  const path = url.pathname;
   if (host === 'github.com') {
+    if (path.toLowerCase().startsWith('/adoptium/')) return true;
     return pathMatchesRepo(path, gh);
   }
   if (host === 'raw.githubusercontent.com') {
@@ -49,9 +70,6 @@ function isTrustedUrl(urlString, { allowMcsrvstat = false, allowGithubAssets = f
   }
   if (host === 'api.github.com') {
     return path.toLowerCase().startsWith(`/repos/${gh.owner}/${gh.repo}/`);
-  }
-  if (host === 'operativniki.minerent.io' && path.startsWith('/launcher/')) {
-    return true;
   }
   return false;
 }
@@ -64,7 +82,7 @@ function assertTrustedUrl(urlString, options = {}) {
 
 function assertDownloadUrl(urlString, { redirect = false } = {}) {
   if (isTrustedUrl(urlString)) return;
-  if (redirect && isGithubAssetRedirect(urlString)) return;
+  if (redirect && isAdoptiumGithubUrl(urlString)) return;
   throw new Error(`Загрузка заблокирована: неразрешённый URL (${urlString})`);
 }
 
